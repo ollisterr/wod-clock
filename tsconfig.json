@@ -1,0 +1,17 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true
+  },
+  "moduleResolution": "node",
+  "baseUrl": "./",
+  "paths": {
+    "@components/*": ["components/*"],
+    "@screens/*": ["screens/*"],
+    "@styles/*": ["styles/*"],
+    "@utils/*": ["utils/*"],
+    "@hooks/*": ["hooks/*"],
+    "@constants/*": ["constants/*"]
+  },
+  "types": ["styled-components-react-native"]
+}
