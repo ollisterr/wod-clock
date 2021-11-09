@@ -5,13 +5,14 @@ interface Props {
   startValue?: number;
   intervalLength?: 10 | 1000 | 60000;
   countDown?: boolean;
+  onPause?: (time: number) => void;
 }
 
-export default function useTime({
-  startValue = 0,
-  intervalLength = CENTSECOND,
-  countDown = false,
-}: Props) {
+export default function useTime(props?: Props) {
+  const startValue = props?.startValue ?? 0;
+  const intervalLength = props?.intervalLength ?? CENTSECOND;
+  const countDown = props?.countDown ?? false;
+
   // time in milliseconds
   const [time, setTime] = React.useState(startValue);
   const [interval, updateInterval] = React.useState<number>();
@@ -25,30 +26,43 @@ export default function useTime({
   }, [setTime, intervalLength, countDown, interval]);
 
   React.useEffect(() => {
+    // allow updating props only when the timer is not running
+    if (!interval) {
+      setTime(startValue);
+    }
+  }, [startValue]);
+
+  React.useEffect(() => {
     return () => {
       if (interval) clearInterval(interval);
+      updateInterval(undefined);
     };
   }, []);
 
   const pause = useCallback(() => {
     clearInterval(interval);
-  }, [interval]);
+    updateInterval(undefined);
+    if (props?.onPause) props.onPause(time);
+  }, [interval, time]);
 
   React.useEffect(() => {
-    if (time < intervalLength) {
+    if (countDown && time < intervalLength) {
       pause();
       setTime(0);
     }
   }, [time, pause]);
 
   const start = useCallback(() => {
-    const newInterval = setInterval(updateTime, [intervalLength]);
+    if (!interval) {
+      const newInterval = window.setInterval(updateTime, intervalLength);
 
-    updateInterval(newInterval);
+      updateInterval(newInterval);
+    }
   }, [intervalLength, updateTime]);
 
   const reset = useCallback(() => {
     setTime(startValue);
+    updateInterval(undefined);
   }, [startValue]);
 
   const stop = useCallback(() => {
@@ -56,5 +70,5 @@ export default function useTime({
     reset();
   }, [pause, reset]);
 
-  return { time, pause, start, stop, reset, setTime };
+  return { time, pause, start, stop, reset, setTime, isRunning: !!interval };
 }

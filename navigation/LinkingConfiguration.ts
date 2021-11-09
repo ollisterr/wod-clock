@@ -13,11 +13,9 @@ const linking: LinkingOptions<RootStackParamList> = {
         screens: {
           Stopwatch: "stopwatch",
           Timer: "timer",
-          Rounds: "rounds"
+          Rounds: "rounds",
         },
       },
-      Modal: "modal",
-      NotFound: "*",
     },
   },
 };

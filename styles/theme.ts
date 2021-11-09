@@ -1,6 +1,8 @@
+import { css } from "styled-components/native";
 import { px } from "../utils/style.utils";
 
 const theme = {
+  px,
   colors: {
     // accents
     peach: "#ff6f3b",
@@ -12,6 +14,7 @@ const theme = {
     grey: "#555",
     lightgrey: "#aaa",
     whitesmoke: "#ddd",
+    white: "#fff",
   },
   borderRadius: {
     small: px(3),
@@ -30,6 +33,12 @@ const theme = {
     xlarge: px(48),
     xxlarge: px(64),
     xxxlarge: px(128),
+  },
+  typography: {
+    timer: css`
+      font-family: "space-mono";
+      font-size: ${px(60)};
+    `,
   },
 };
 
