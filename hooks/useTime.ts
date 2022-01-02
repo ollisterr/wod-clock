@@ -1,16 +1,18 @@
 import React, { useCallback } from "react";
 import { CENTSECOND } from "../constants/time";
 
+export type Interval = 10 | 1000 | 60000;
+
 interface Props {
   startValue?: number;
-  intervalLength?: 10 | 1000 | 60000;
+  intervalLength?: Interval;
   countDown?: boolean;
   onPause?: (time: number) => void;
 }
 
 export default function useTime(props?: Props) {
   const startValue = props?.startValue ?? 0;
-  const intervalLength = props?.intervalLength ?? CENTSECOND;
+  const intervalLength = props?.intervalLength ?? 71;
   const countDown = props?.countDown ?? false;
 
   // time in milliseconds
@@ -30,14 +32,12 @@ export default function useTime(props?: Props) {
     if (!interval) {
       setTime(startValue);
     }
-  }, [startValue]);
 
-  React.useEffect(() => {
     return () => {
       if (interval) clearInterval(interval);
       updateInterval(undefined);
     };
-  }, []);
+  }, [startValue]);
 
   const pause = useCallback(() => {
     clearInterval(interval);

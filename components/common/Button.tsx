@@ -1,8 +1,7 @@
 import React, { ReactNode } from "react";
-import { TouchableNativeFeedbackProps, View } from "react-native";
+import { TouchableNativeFeedbackProps } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { Spacer } from ".";
 import styled from "../../styles";
 import theme from "../../styles/theme";
 
@@ -52,9 +51,9 @@ export function IconButton({ children, ...rest }: Props) {
 }
 
 const IconButtonWrapper = styled.TouchableOpacity`
-  width: ${(p) => p.theme.px(20)};
-  height: ${(p) => p.theme.px(20)};
-  border-radius: 100%;
+  width: ${(p) => p.theme.px(70)};
+  height: ${(p) => p.theme.px(70)};
+  border-radius: 999px;
   overflow: hidden;
   border: solid 4px rgba(255, 255, 255, 0.1);
 `;
@@ -71,6 +70,4 @@ const IconWrapper = styled.View`
   position: absolute;
   align-items: center;
   justify-content: center;
-  width: ${(p) => p.theme.px(16)};
-  height: ${(p) => p.theme.px(16)};
 `;

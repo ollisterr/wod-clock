@@ -33,12 +33,13 @@ export default function TimerInput({
       color={color}
       placeholder={placeholder}
       selectTextOnFocus
+      keyboardType="number-pad"
     />
   );
 }
 
 const Input = styled.TextInput<{ color?: Color }>`
-  width: 240px;
   ${(p) => p.theme.typography.timer}
+  flex: 1 1 ${(p) => p.theme.px(60)};
   color: ${(p) => p.theme.colors[p.color ?? "peach"]};
 `;
