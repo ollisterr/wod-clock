@@ -1,6 +1,6 @@
 import styled from ".";
 
-export const RoundButton = styled.TouchableHighlight`
+export const RoundButton = styled.TouchableOpacity`
   background-color: ${(p) => p.theme.colors.peach};
   border-radius: ${(p) => p.theme.borderRadius.pill};
 `;

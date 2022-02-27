@@ -8,7 +8,7 @@ import useTime, { Interval } from "../../hooks/useTime";
 import styled from "../../styles";
 import { EvenRow } from "../../styles/styles";
 import theme, { Color } from "../../styles/theme";
-import { leadingZeros, timeBreakdown } from "../../utils/time.utils";
+import { timeBreakdown } from "../../utils/time.utils";
 
 interface Props {
   startTime?: number;
@@ -44,14 +44,17 @@ export default function Timer({
 
   const { time, start, pause, reset, isRunning } = useTime({
     startValue: timeInMs,
+    resetValue: 0,
     intervalLength,
     countDown,
-    onPause: (currentTime) => {
-      const components = timeBreakdown(currentTime);
-      setHours(components.hours);
-      setMinutes(components.minutes);
-      setSeconds(components.seconds);
-    },
+    onPause: editable
+      ? (currentTime) => {
+          const components = timeBreakdown(currentTime);
+          setHours(components.hours);
+          setMinutes(components.minutes);
+          setSeconds(components.seconds);
+        }
+      : undefined,
   });
 
   useEffect(() => {
@@ -68,48 +71,37 @@ export default function Timer({
     }
   }, [time, isRunning]);
 
-  const hoursFormatted = leadingZeros(Math.floor(time / HOUR));
-  const minutesFormatted = leadingZeros(Math.floor(time / MINUTE) % 60);
-  const secondsFormatted = leadingZeros(Math.floor(time / SECOND) % 60);
-  const centSecondsFormatted = leadingZeros(
-    Math.floor(time / CENTSECOND) % 100
-  );
-
   return (
     <Wrapper>
       <TimerWrapper>
-        {isRunning || !editable ? (
+        {showHours && (
           <>
-            {showHours && (
-              <>
-                <TimerText>{hoursFormatted}</TimerText>
-                <TimerText>:</TimerText>
-              </>
-            )}
-            <TimerText>{minutesFormatted}</TimerText>
-            <TimerText>:</TimerText>
-            <TimerText>{secondsFormatted}</TimerText>
-            {showCentseconds && (
-              <>
-                <TimerText>:</TimerText>
-                <TimerText>{centSecondsFormatted}</TimerText>
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            <TimeInput value={hours} onChange={setHours} editable={editable} />
-            <TimerText>:</TimerText>
             <TimeInput
-              value={minutes}
-              onChange={setMinutes}
+              value={Math.floor(time / HOUR)}
+              onChange={setHours}
               editable={editable}
             />
             <TimerText>:</TimerText>
+          </>
+        )}
+        <TimeInput
+          value={Math.floor(time / MINUTE) % 60}
+          onChange={setMinutes}
+          editable={editable}
+        />
+        <TimerText>:</TimerText>
+        <TimeInput
+          value={Math.floor(time / SECOND) % 60}
+          onChange={setSeconds}
+          editable={editable}
+        />
+        {showCentseconds && (
+          <>
+            <TimerText>:</TimerText>
             <TimeInput
-              value={seconds}
-              onChange={setSeconds}
-              editable={editable}
+              value={Math.floor(time / CENTSECOND) % 100}
+              onChange={() => undefined}
+              editable={false}
             />
           </>
         )}

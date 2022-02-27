@@ -1,10 +1,10 @@
 import React, { useCallback } from "react";
-import { CENTSECOND } from "../constants/time";
 
 export type Interval = 10 | 1000 | 60000;
 
 interface Props {
   startValue?: number;
+  resetValue?: number;
   intervalLength?: Interval;
   countDown?: boolean;
   onPause?: (time: number) => void;
@@ -12,6 +12,7 @@ interface Props {
 
 export default function useTime(props?: Props) {
   const startValue = props?.startValue ?? 0;
+  const resetValue = props?.resetValue ?? startValue;
   const intervalLength = props?.intervalLength ?? 71;
   const countDown = props?.countDown ?? false;
 
@@ -61,9 +62,9 @@ export default function useTime(props?: Props) {
   }, [intervalLength, updateTime]);
 
   const reset = useCallback(() => {
-    setTime(startValue);
+    setTime(resetValue);
     updateInterval(undefined);
-  }, [startValue]);
+  }, [resetValue]);
 
   const stop = useCallback(() => {
     pause();

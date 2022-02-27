@@ -1,5 +1,6 @@
 import React from "react";
 import { TextInputProps } from "react-native";
+import { css } from "styled-components";
 import styled from "../../styles";
 import { Color } from "../../styles/theme";
 import { leadingZeros } from "../../utils/time.utils";
@@ -11,6 +12,7 @@ interface Props extends Omit<TextInputProps, "value" | "onChange"> {
   value: number;
   digits?: number;
   onChange: (value: number) => void;
+  editable?: boolean;
 }
 export default function TimerInput({
   value,
@@ -20,26 +22,47 @@ export default function TimerInput({
   min = 0,
   max = 59,
   placeholder,
+  editable = true,
 }: Props) {
   const onChangeText = (text: string) =>
     onChange(
       Math.max(min ?? -Infinity, Math.min(max ?? Infinity, Number(text)))
     );
 
+  const formattedValue = leadingZeros(value, digits);
   return (
-    <Input
-      value={leadingZeros(value, digits)}
-      onChangeText={onChangeText}
-      color={color}
-      placeholder={placeholder}
-      selectTextOnFocus
-      keyboardType="number-pad"
-    />
+    <Wrapper>
+      {editable ? (
+        <Input
+          value={formattedValue}
+          onChangeText={onChangeText}
+          color={color}
+          placeholder={placeholder}
+          selectTextOnFocus
+          keyboardType="number-pad"
+        />
+      ) : (
+        <TimerText color={color}>{formattedValue}</TimerText>
+      )}
+    </Wrapper>
   );
 }
+const Wrapper = styled.View`
+  flex: 1 1 30%;
+`;
 
-const Input = styled.TextInput<{ color?: Color }>`
+const typographyStyle = css<{ color?: Color }>`
   ${(p) => p.theme.typography.timer}
-  flex: 1 1 ${(p) => p.theme.px(60)};
   color: ${(p) => p.theme.colors[p.color ?? "peach"]};
+  text-align: center;
+`;
+
+const Input = styled.TextInput`
+  ${typographyStyle}
+  flex: 1;
+  max-width: 100%;
+`;
+
+const TimerText = styled.Text`
+  ${typographyStyle}
 `;
