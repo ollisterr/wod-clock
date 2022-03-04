@@ -24,10 +24,12 @@ export default function TimerInput({
   placeholder,
   editable = true,
 }: Props) {
-  const onChangeText = (text: string) =>
+  const onChangeText = (text: string) => {
+    if (isNaN(Number(text))) return;
     onChange(
       Math.max(min ?? -Infinity, Math.min(max ?? Infinity, Number(text)))
     );
+  };
 
   const formattedValue = leadingZeros(value, digits);
   return (

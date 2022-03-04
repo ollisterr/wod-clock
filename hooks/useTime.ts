@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 
 export type Interval = 10 | 1000 | 60000;
 
@@ -20,13 +20,17 @@ export default function useTime(props?: Props) {
   const [time, setTime] = React.useState(startValue);
   const [interval, updateInterval] = React.useState<number>();
 
+  const startTimeStamp = useRef(Date.now());
+
   const updateTime = useCallback(() => {
+    const timeDiff = Date.now() - startTimeStamp.current;
+
     if (countDown) {
-      setTime((x) => Math.max(x - intervalLength, 0));
+      setTime(Math.max(startValue - timeDiff, 0));
     } else {
-      setTime((x) => x + intervalLength);
+      setTime(timeDiff);
     }
-  }, [setTime, intervalLength, countDown, interval]);
+  }, [setTime, countDown, startValue]);
 
   React.useEffect(() => {
     // allow updating props only when the timer is not running
@@ -55,6 +59,7 @@ export default function useTime(props?: Props) {
 
   const start = useCallback(() => {
     if (!interval) {
+      startTimeStamp.current = Date.now();
       const newInterval = window.setInterval(updateTime, intervalLength);
 
       updateInterval(newInterval);
