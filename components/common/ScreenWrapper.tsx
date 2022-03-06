@@ -7,9 +7,10 @@ import theme from "../../styles/theme";
 
 interface Props {
   children: ReactNode;
+  noPadding?: boolean;
 }
 
-export default function ScreenWrapper({ children }: Props) {
+export default function ScreenWrapper({ children, ...rest }: Props) {
   return (
     <Wrapper>
       <ScrollView
@@ -19,7 +20,7 @@ export default function ScreenWrapper({ children }: Props) {
         }}
         keyboardShouldPersistTaps="handled"
       >
-        <ContentWrapper>{children}</ContentWrapper>
+        <ContentWrapper {...rest}>{children}</ContentWrapper>
       </ScrollView>
     </Wrapper>
   );
@@ -32,10 +33,10 @@ const Wrapper = styled(LinearGradient).attrs({
   flex: 1;
 `;
 
-const ContentWrapper = styled.View`
+const ContentWrapper = styled.View<{ noPadding?: boolean }>`
   width: 100%;
   flex-grow: 1;
   align-items: center;
   justify-content: center;
-  padding: ${(p) => p.theme.spacing.default};
+  ${(p) => !p.noPadding && `padding: ${p.theme.spacing.default};`}
 `;

@@ -39,10 +39,16 @@ const theme = {
       font-family: "space-mono";
       font-size: ${px(60)};
     `,
+    body: css`
+      font-family: "space-mono";
+      font-size: ${px(16)};
+    `,
   },
 };
 
 export type Theme = typeof theme;
+
+export type Typography = keyof Theme["typography"];
 
 export type Color = keyof Theme["colors"];
 

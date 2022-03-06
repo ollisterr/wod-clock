@@ -10,6 +10,7 @@ import * as React from "react";
 import { ColorSchemeName } from "react-native";
 
 import NotFoundScreen from "../screens/NotFoundScreen";
+import SetsScreen from "../screens/SetsScreen";
 import StopwatchScreen from "../screens/StopwatchScreen";
 import TimerScreen from "../screens/TimerScreen";
 import theme from "../styles/theme";
@@ -75,6 +76,14 @@ function BottomTabNavigator() {
         component={TimerScreen}
         options={{
           title: "Timer",
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="Rounds"
+        component={SetsScreen}
+        options={{
+          title: "Rounds",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />

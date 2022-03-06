@@ -1,80 +1,98 @@
 import React, { useCallback, useRef } from "react";
 
-export type Interval = 10 | 1000 | 60000;
+export type Interval = 10 | 500 | 1000 | 60000;
 
 interface Props {
   startValue?: number;
   resetValue?: number;
-  intervalLength?: Interval;
+  intervalLength?: number;
   countDown?: boolean;
   onPause?: (time: number) => void;
+  onStart?: () => void;
+  onReset?: () => void;
+  onTimeEnd?: () => void;
+  rounds?: number;
 }
 
 export default function useTime(props?: Props) {
-  const startValue = props?.startValue ?? 0;
-  const resetValue = props?.resetValue ?? startValue;
   const intervalLength = props?.intervalLength ?? 71;
   const countDown = props?.countDown ?? false;
+  const rounds = props?.rounds ?? 0;
+
+  const startValue = useRef(props?.startValue ?? 0);
+  const startTimeStamp = useRef(Date.now());
 
   // time in milliseconds
-  const [time, setTime] = React.useState(startValue);
+  const [time, setTime] = React.useState(startValue.current);
+  const resetValue = props?.resetValue ?? startValue.current;
   const [interval, updateInterval] = React.useState<number>();
-
-  const startTimeStamp = useRef(Date.now());
 
   const updateTime = useCallback(() => {
     const timeDiff = Date.now() - startTimeStamp.current;
 
     if (countDown) {
-      setTime(Math.max(startValue - timeDiff, 0));
+      setTime(Math.max(startValue.current - timeDiff, 0));
     } else {
       setTime(timeDiff);
     }
-  }, [setTime, countDown, startValue]);
+  }, [countDown]);
+
+  const resetInterval = () => {
+    if (interval) clearInterval(interval);
+    updateInterval(undefined);
+  };
 
   React.useEffect(() => {
-    // allow updating props only when the timer is not running
-    if (!interval) {
-      setTime(startValue);
-    }
+    return resetInterval;
+  }, []);
 
-    return () => {
-      if (interval) clearInterval(interval);
-      updateInterval(undefined);
-    };
-  }, [startValue]);
+  React.useEffect(() => {
+    const newValue = props?.startValue ?? 0;
+    startValue.current = newValue;
+
+    if (!interval) setTime(newValue);
+  }, [props?.startValue]);
 
   const pause = useCallback(() => {
-    clearInterval(interval);
-    updateInterval(undefined);
+    resetInterval();
     if (props?.onPause) props.onPause(time);
   }, [interval, time]);
 
-  React.useEffect(() => {
-    if (countDown && time < intervalLength) {
+  const reset = useCallback(
+    (newTime?: number) => {
+      props?.onReset?.();
+      startTimeStamp.current = Date.now();
+      setTime(newTime ?? resetValue);
+    },
+    [resetValue, interval, props?.onReset]
+  );
+
+  const stop = useCallback(
+    (newTime?: number) => {
       pause();
-      setTime(0);
+      reset(newTime);
+    },
+    [pause, reset]
+  );
+
+  React.useEffect(() => {
+    if (countDown && time < intervalLength && !!interval) {
+      // stop clock triggered by onTimeEnd or round finish
+      if (props?.onTimeEnd?.() || rounds === 0) {
+        stop(0);
+      }
     }
-  }, [time, pause]);
+  }, [time, stop, interval]);
 
   const start = useCallback(() => {
-    if (!interval) {
-      startTimeStamp.current = Date.now();
-      const newInterval = window.setInterval(updateTime, intervalLength);
+    props?.onStart?.();
+    if (interval) resetInterval();
 
-      updateInterval(newInterval);
-    }
-  }, [intervalLength, updateTime]);
+    startTimeStamp.current = Date.now();
+    const newInterval = window.setInterval(updateTime, intervalLength);
 
-  const reset = useCallback(() => {
-    setTime(resetValue);
-    updateInterval(undefined);
-  }, [resetValue]);
+    updateInterval(newInterval);
+  }, [interval, intervalLength, updateTime, props?.onStart]);
 
-  const stop = useCallback(() => {
-    pause();
-    reset();
-  }, [pause, reset]);
-
-  return { time, pause, start, stop, reset, setTime, isRunning: !!interval };
+  return { time, pause, start, stop, reset, isRunning: !!interval };
 }

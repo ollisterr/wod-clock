@@ -1,9 +1,8 @@
 import React, { ReactNode } from "react";
 import { TouchableNativeFeedbackProps } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 
 import styled from "../../styles";
-import theme from "../../styles/theme";
+import { Spacing } from "../../styles/theme";
 
 interface Props extends TouchableNativeFeedbackProps {
   text?: string;
@@ -40,30 +39,33 @@ const ButtonText = styled.Text`
   text-transform: uppercase;
 `;
 
-export function IconButton({ children, ...rest }: Props) {
+interface IconButtonProps extends Props {
+  size?: Spacing;
+}
+
+export function IconButton({
+  children,
+  size = "xxlarge",
+  ...rest
+}: IconButtonProps) {
   return (
-    <IconButtonWrapper {...rest}>
-      <GradientWrapper colors={[theme.colors.grey, theme.colors.black]}>
-        <IconWrapper>{children}</IconWrapper>
-      </GradientWrapper>
+    <IconButtonWrapper {...rest} size={size}>
+      <IconWrapper>{children}</IconWrapper>
     </IconButtonWrapper>
   );
 }
 
-const IconButtonWrapper = styled.TouchableOpacity`
-  width: ${(p) => p.theme.px(70)};
-  height: ${(p) => p.theme.px(70)};
+const IconButtonWrapper = styled.TouchableOpacity<{
+  size: Spacing;
+}>`
+  width: ${(p) => p.theme.spacing[p.size]};
+  height: ${(p) => p.theme.spacing[p.size]};
   border-radius: 999px;
   overflow: hidden;
-  border: solid 4px rgba(255, 255, 255, 0.1);
-`;
-
-const GradientWrapper = styled(LinearGradient)`
-  width: 100%;
-  height: 100%;
+  border: solid 3px rgba(255, 255, 255, 0.3);
   align-items: center;
   justify-content: center;
-  background-color: black;
+  ${(p) => p.disabled && "opacity: 0.2;"}
 `;
 
 const IconWrapper = styled.View`
