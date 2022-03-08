@@ -1,14 +1,25 @@
 import { FontAwesome } from "@expo/vector-icons";
-import React, { forwardRef, useEffect, useImperativeHandle } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import { Vibration } from "react-native";
 
 import { IconButton, TimeInput } from ".";
 import { CENTSECOND, HOUR, MINUTE, SECOND } from "../../constants/time";
+import { useSettings } from "../../contexts/SettingsContext";
 import useTime from "../../hooks/useTime";
 import styled from "../../styles";
 import { EvenRow } from "../../styles/styles";
 import theme, { Color } from "../../styles/theme";
-import { timeBreakdown } from "../../utils/time.utils";
+import {
+  timeBreakdown,
+  TimeComponents,
+  timeComponentsToMilliseconds,
+} from "../../utils/time.utils";
+import Countdown from "../Countdown";
 
 interface Props {
   startTime?: number;
@@ -16,7 +27,6 @@ interface Props {
   showHours?: boolean;
   showCentseconds?: boolean;
   editable?: boolean;
-  vibrate?: boolean;
   intervalLength?: number;
   onReset?: () => void;
   onTimeEnd?: () => void | boolean;
@@ -35,47 +45,49 @@ const Timer = forwardRef(
       showHours = false,
       showCentseconds = !showHours,
       editable = true,
-      vibrate = true,
       onReset,
       ...props
     }: Props,
     ref
   ) => {
-    const [hours, setHours] = React.useState(0);
-    const [minutes, setMinutes] = React.useState(0);
-    const [seconds, setSeconds] = React.useState(0);
-    const [resetValue, setResetValue] = React.useState(startTime);
+    const {
+      vibrationEnabled,
+      audioEnabled,
+      countdownEnabled,
+      countdownLength,
+    } = useSettings();
 
-    const timeInMs = hours * HOUR + minutes * MINUTE + seconds * SECOND;
+    const [shouldStart, setShouldStart] = useState(false);
+    const [timeComponents, setTimeComponents] = useState<TimeComponents>({
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      milliseconds: 0,
+    });
+    const [resetValue, setResetValue] = useState(startTime);
 
-    const setTime = (time: number) => {
-      const components = timeBreakdown(time);
-      setHours(components.hours);
-      setMinutes(components.minutes);
-      setSeconds(components.seconds);
-    };
+    const timeInMs = timeComponentsToMilliseconds(timeComponents);
+
+    const setTime = (time: number) => setTimeComponents(timeBreakdown(time));
 
     const { time, reset, start, pause, stop, isRunning } = useTime({
       startValue: timeInMs,
       resetValue,
       countDown,
-      onStart: () => setResetValue(timeInMs),
-      onPause: editable ? setTime : undefined,
+      onPause: setTime,
       onReset: countDown ? () => setTime(resetValue) : undefined,
       ...props,
     });
 
     useEffect(() => {
-      const time = timeBreakdown(startTime);
-      setHours(time.hours);
-      setMinutes(time.minutes);
-      setSeconds(time.seconds);
+      setTime(startTime);
+      setResetValue(startTime);
     }, [startTime]);
 
     useEffect(() => {
       const components = timeBreakdown(time);
       if (
-        vibrate &&
+        vibrationEnabled &&
         isRunning &&
         countDown &&
         [0, 1, 2, 3, 4, 5].includes(components.seconds) &&
@@ -84,7 +96,7 @@ const Timer = forwardRef(
       ) {
         Vibration.vibrate();
       }
-    }, [time, isRunning]);
+    }, [time, isRunning, vibrationEnabled]);
 
     useImperativeHandle(ref, () => ({
       setTime: reset,
@@ -92,8 +104,31 @@ const Timer = forwardRef(
 
     const onResetPress = () => {
       onReset?.();
-      stop();
+      reset();
     };
+
+    const onStartPress = () =>
+      countdownEnabled && time === resetValue ? setShouldStart(true) : start();
+
+    if (shouldStart && countdownEnabled && time === resetValue) {
+      return (
+        <Countdown
+          length={countdownLength}
+          onFinish={() => {
+            setShouldStart(false);
+            start();
+          }}
+        />
+      );
+    }
+
+    const setTimeComponent =
+      (component: keyof TimeComponents) => (newValue: number) => {
+        const newTime = { ...timeComponents, [component]: newValue };
+        setTimeComponents(newTime);
+        // set new reset value when inputs are manually changed
+        setResetValue(timeComponentsToMilliseconds(newTime));
+      };
 
     return (
       <Wrapper>
@@ -102,7 +137,7 @@ const Timer = forwardRef(
             <>
               <TimeInput
                 value={Math.floor(time / HOUR)}
-                onChange={setHours}
+                onChange={setTimeComponent("hours")}
                 editable={editable}
               />
               <TimerText>:</TimerText>
@@ -110,13 +145,13 @@ const Timer = forwardRef(
           )}
           <TimeInput
             value={Math.floor(time / MINUTE) % 60}
-            onChange={setMinutes}
+            onChange={setTimeComponent("minutes")}
             editable={editable}
           />
           <TimerText>:</TimerText>
           <TimeInput
             value={Math.floor(time / SECOND) % 60}
-            onChange={setSeconds}
+            onChange={setTimeComponent("seconds")}
             editable={editable}
           />
           {showCentseconds && (
@@ -132,13 +167,17 @@ const Timer = forwardRef(
         </TimerWrapper>
 
         <EvenRow>
+          <IconButton onPress={() => stop()}>
+            <FontAwesome name="square" size={20} color={theme.colors.white} />
+          </IconButton>
+
           {isRunning ? (
             <IconButton onPress={pause}>
               <FontAwesome name="pause" size={20} color={theme.colors.white} />
             </IconButton>
           ) : (
             <IconButton
-              onPress={start}
+              onPress={onStartPress}
               disabled={countDown && (timeInMs === 0 || time === 0)}
             >
               <FontAwesome name="play" size={20} color={theme.colors.white} />

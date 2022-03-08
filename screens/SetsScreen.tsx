@@ -24,16 +24,13 @@ export default function SetsScreen() {
   const timerRef = useRef<Timer>();
 
   const onSetEnd = () => {
-    if (activeSet < sets.length - 1) {
-      setActiveSet(activeSet + 1);
-      timerRef.current?.setTime(sets[activeSet + 1].duration);
-    } else if (rounds > 1) {
-      setRounds((x) => x - 1);
-      setActiveSet(0);
+    const nextSetIndex = (activeSet + 1) % sets.length;
+    setActiveSet(nextSetIndex);
+
+    if (nextSetIndex === 0) {
+      setRounds((x) => Math.max(x - 1, 0));
     } else {
-      setRounds(0);
-      // trigger stop timer
-      return true;
+      timerRef.current?.setTime(sets[nextSetIndex].duration);
     }
   };
 

@@ -18,6 +18,7 @@ export type RootTabParamList = {
   Stopwatch: undefined;
   Timer: undefined;
   Rounds: undefined;
+  Settings: undefined;
 };
 
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> =

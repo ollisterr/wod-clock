@@ -7,4 +7,15 @@ export const timeBreakdown = (ms: number) => ({
   hours: Math.floor(ms / HOUR),
   minutes: Math.floor(ms / MINUTE) % 60,
   seconds: Math.floor(ms / SECOND) % 60,
+  milliseconds: ms % 1000,
 });
+
+export type TimeComponents = ReturnType<typeof timeBreakdown>;
+
+export const timeComponentsToMilliseconds = ({
+  hours,
+  minutes,
+  seconds,
+  milliseconds,
+}: TimeComponents) =>
+  hours * HOUR + minutes * MINUTE + seconds * SECOND + milliseconds;

@@ -11,6 +11,7 @@ import { ColorSchemeName } from "react-native";
 
 import NotFoundScreen from "../screens/NotFoundScreen";
 import SetsScreen from "../screens/SetsScreen";
+import SettingsScreen from "../screens/SettingsScreen";
 import StopwatchScreen from "../screens/StopwatchScreen";
 import TimerScreen from "../screens/TimerScreen";
 import theme from "../styles/theme";
@@ -59,7 +60,16 @@ function BottomTabNavigator() {
     <BottomTab.Navigator
       screenOptions={{
         tabBarActiveTintColor: theme.colors.peach,
+        tabBarInactiveBackgroundColor: theme.colors.black,
+        tabBarActiveBackgroundColor: theme.colors.black,
         headerShown: false,
+        tabBarStyle: {
+          borderTopWidth: 0,
+          height: 70,
+        },
+        tabBarLabelStyle: {
+          paddingBottom: theme.spacing.small,
+        },
       }}
     >
       <BottomTab.Screen
@@ -67,7 +77,9 @@ function BottomTabNavigator() {
         component={StopwatchScreen}
         options={{
           title: "Stopwatch",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="clock-o" color={color} />
+          ),
         }}
       />
 
@@ -76,7 +88,9 @@ function BottomTabNavigator() {
         component={TimerScreen}
         options={{
           title: "Timer",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="hourglass-end" color={color} />
+          ),
         }}
       />
       <BottomTab.Screen
@@ -84,7 +98,15 @@ function BottomTabNavigator() {
         component={SetsScreen}
         options={{
           title: "Rounds",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="repeat" color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color }) => <TabBarIcon name="gear" color={color} />,
         }}
       />
     </BottomTab.Navigator>
@@ -95,5 +117,5 @@ function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
 }) {
-  return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome size={30} {...props} />;
 }
