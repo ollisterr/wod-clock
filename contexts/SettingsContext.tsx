@@ -1,13 +1,23 @@
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-interface SettingsContext {
+interface Settings {
   countdownEnabled: boolean;
-  toggleCountdownEnabled: () => void;
-  countdownLength: number;
-  setCountdownLength: (x: number) => void;
   audioEnabled: boolean;
-  toggleAudioEnabled: () => void;
   vibrationEnabled: boolean;
+  countdownLength: number;
+}
+
+interface SettingsContext extends Settings {
+  toggleCountdownEnabled: () => void;
+  setCountdownLength: (x: number) => void;
+  toggleAudioEnabled: () => void;
   toggleVibrationEnabled: () => void;
 }
 
@@ -25,26 +35,48 @@ export const useSettings = () => {
   return settingsContext;
 };
 
-export default function SettingsProvider({ children }: Props) {
-  const [countdownEnabled, setCountdownEnabled] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(true);
-  const [vibrationEnabled, setVibrationEnabled] = useState(true);
-  const [countdownLength, setCountdownLength] = useState(5);
+const SETTINGS_STORAGE_KEY = "app_settings";
 
-  const toggleCountdownEnabled = () => setCountdownEnabled((x) => !x);
-  const toggleAudioEnabled = () => setAudioEnabled((x) => !x);
-  const toggleVibrationEnabled = () => setVibrationEnabled((x) => !x);
+export default function SettingsProvider({ children }: Props) {
+  const [settings, setSettings] = useState<Settings>({
+    countdownEnabled: true,
+    audioEnabled: true,
+    vibrationEnabled: true,
+    countdownLength: 5,
+  });
+
+  useEffect(() => {
+    AsyncStorage.getItem(SETTINGS_STORAGE_KEY).then((storedSettings) => {
+      if (!storedSettings) return;
+      setSettings(JSON.parse(storedSettings));
+    });
+  }, []);
+
+  const updateSettings = <T extends keyof Settings>(
+    setting: T,
+    newValue: Settings[T]
+  ) => {
+    const updatedSettings = { ...settings, [setting]: newValue };
+    setSettings(updatedSettings);
+    AsyncStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(updatedSettings));
+  };
+
+  const toggleCountdownEnabled = () =>
+    updateSettings("countdownEnabled", !settings.countdownEnabled);
+  const setCountdownLength = (x: number) =>
+    updateSettings("countdownLength", x);
+  const toggleAudioEnabled = () =>
+    updateSettings("audioEnabled", !settings.audioEnabled);
+  const toggleVibrationEnabled = () =>
+    updateSettings("vibrationEnabled", !settings.vibrationEnabled);
 
   return (
     <SettingsContext.Provider
       value={{
-        countdownEnabled,
+        ...settings,
         toggleCountdownEnabled,
-        countdownLength,
         setCountdownLength,
-        audioEnabled,
         toggleAudioEnabled,
-        vibrationEnabled,
         toggleVibrationEnabled,
       }}
     >
