@@ -33,6 +33,9 @@ export default function SetsScreen() {
 
     if (nextSetIndex === 0) {
       setRounds((x) => Math.max(x - 1, 0));
+    }
+    if (nextSetIndex === 0 && rounds === 1) {
+      timerRef.current?.setTime(0);
     } else {
       timerRef.current?.setTime(sets[nextSetIndex].duration);
     }
