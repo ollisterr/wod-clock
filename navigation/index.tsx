@@ -70,6 +70,17 @@ function BottomTabNavigator() {
         tabBarLabelStyle: {
           paddingBottom: 12,
         },
+        tabBarHideOnKeyboard: true,
+        tabBarVisibilityAnimationConfig: {
+          show: {
+            animation: "timing",
+            config: { duration: 0 },
+          },
+          hide: {
+            animation: "timing",
+            config: { duration: 500 },
+          },
+        },
       }}
     >
       <BottomTab.Screen

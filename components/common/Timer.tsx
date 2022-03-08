@@ -225,6 +225,7 @@ const TimerWrapper = styled.View`
 const TimerText = styled.Text<{ color?: Color }>`
   ${(p) => p.theme.typography.timer}
   color: ${(p) => p.theme.colors[p.color ?? "peach"]};
+  line-height: ${(p) => p.theme.px(78)};
 `;
 
 const MiddleButtonWrapper = styled.View`

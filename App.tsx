@@ -22,7 +22,7 @@ export default function App() {
           <SettingsProvider>
             <Navigation colorScheme={colorScheme} />
 
-            <StatusBar />
+            <StatusBar style="light" />
           </SettingsProvider>
         </SafeAreaProvider>
       </ThemeProvider>
