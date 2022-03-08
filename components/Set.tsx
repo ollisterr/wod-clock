@@ -2,12 +2,11 @@ import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
 import { View } from "react-native";
 
-import { IconButton, Spacer } from ".";
+import { IconButton, Spacer, ProgressBar } from "./common";
 import { SECOND } from "../constants/time";
 import styled from "../styles";
 import { Text } from "../styles/styles";
 import theme from "../styles/theme";
-import ProgressBar from "./common/ProgressBar";
 import { SetType } from "./types";
 
 interface Props extends Required<SetType> {

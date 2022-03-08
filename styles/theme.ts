@@ -37,7 +37,7 @@ const theme = {
   typography: {
     timer: css`
       font-family: "space-mono";
-      font-size: ${px(60)};
+      font-size: ${px(56)};
     `,
     body: css`
       font-family: "space-mono";

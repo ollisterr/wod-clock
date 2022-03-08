@@ -40,6 +40,7 @@ export default function SettingsScreen() {
             onChangeText={(x: string) =>
               countdownEnabled && setCountdownLength(Number(x))
             }
+            alignRight
           />
         </InputRow>
 
@@ -64,6 +65,6 @@ const HeaderWrapper = styled.View`
 `;
 
 const InputRow = styled(EvenRow)<{ disabled?: boolean }>`
-  ${(p) => p.disabled && "opacity: 0.5;"}
+  ${(p) => p.disabled && "opacity: 0.3;"}
   padding-vertical: ${(p) => p.theme.spacing.small};
 `;

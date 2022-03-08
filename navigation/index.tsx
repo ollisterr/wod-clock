@@ -68,7 +68,7 @@ function BottomTabNavigator() {
           height: 70,
         },
         tabBarLabelStyle: {
-          paddingBottom: theme.spacing.small,
+          paddingBottom: 12,
         },
       }}
     >

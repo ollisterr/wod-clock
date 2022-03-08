@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -15,17 +16,27 @@ interface Props {
 export default function ProgressBar({ duration, isActive }: Props) {
   const currentProgress = useSharedValue(0);
 
-  const animatedStyles = useAnimatedStyle(() => {
-    return {
-      transform: [{ scaleX: (currentProgress.value / 100) * 2 }],
-    };
-  });
+  const animatedStyles = useAnimatedStyle(() => ({
+    transform: [{ scaleX: currentProgress.value / 100 }],
+  }));
 
   useEffect(() => {
     if (isActive) {
-      currentProgress.value = withTiming(100, { duration });
+      currentProgress.value = withTiming(
+        100,
+        {
+          // continue where the animation left of on pause
+          duration: duration * (1 - currentProgress.value / 100),
+          easing: Easing.linear,
+        },
+        (isFinished) => {
+          // reset on finish
+          if (isFinished) currentProgress.value = 0;
+        }
+      );
     } else {
-      currentProgress.value = 0;
+      // pause animation to the current value
+      currentProgress.value = currentProgress.value.valueOf();
     }
   }, [isActive]);
 
@@ -37,8 +48,8 @@ export default function ProgressBar({ duration, isActive }: Props) {
 }
 
 const Wrapper = styled.View`
-  flex: 1;
-  height: ${(p) => p.theme.spacing.small};
+  width: 100%;
+  height: ${(p) => p.theme.spacing.xxsmall};
   border-radius: 999px;
   background-color: ${(p) => p.theme.colors.grey};
   overflow: hidden;
@@ -46,5 +57,6 @@ const Wrapper = styled.View`
 
 const Progress = styled(Animated.View)`
   height: 100%;
-  background-color: ${(p) => p.theme.colors.white};
+  margin-left: -100%;
+  background-color: ${(p) => p.theme.colors.whitesmoke};
 `;

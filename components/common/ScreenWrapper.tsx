@@ -38,5 +38,5 @@ const ContentWrapper = styled.View<{ noPadding?: boolean }>`
   flex-grow: 1;
   align-items: center;
   justify-content: center;
-  ${(p) => !p.noPadding && `padding: ${p.theme.spacing.default};`}
+  padding: ${(p) => (p.noPadding ? "0px" : p.theme.spacing.default)};
 `;

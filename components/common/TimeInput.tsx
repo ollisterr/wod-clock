@@ -1,6 +1,7 @@
 import React from "react";
 import { TextInputProps } from "react-native";
 import { css } from "styled-components";
+
 import styled from "../../styles";
 import { Color } from "../../styles/theme";
 import { leadingZeros } from "../../utils/time.utils";
@@ -32,6 +33,7 @@ export default function TimerInput({
   };
 
   const formattedValue = leadingZeros(value, digits);
+
   return (
     <Wrapper>
       {editable ? (

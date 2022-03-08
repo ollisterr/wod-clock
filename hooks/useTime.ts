@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default function useTime(props?: Props) {
-  const intervalLength = props?.intervalLength ?? 71;
+  const intervalLength = props?.intervalLength ?? 101;
   const countDown = props?.countDown ?? false;
   const rounds = props?.rounds ?? 0;
 

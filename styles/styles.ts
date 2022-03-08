@@ -27,12 +27,13 @@ export const Text = styled.Text<{
     `}
 `;
 
-export const Input = styled.TextInput<{ flex?: boolean }>`
+export const Input = styled.TextInput<{ fill?: boolean; alignRight?: boolean }>`
   ${(p) => p.theme.typography.body}
   border-radius: ${(p) => p.theme.borderRadius.default};
   padding: ${(p) => p.theme.spacing.small} ${(p) => p.theme.spacing.default};
-  flex: ${(p) => (p.flex ? 1 : 0)} 1 20%;
+  flex: ${(p) => (p.fill ? 1 : 0)} 1 20%;
   width: 20%;
   color: ${(p) => p.theme.colors.white};
   background-color: rgba(0, 0, 0, 0.2);
+  ${(p) => p.alignRight && "text-align: right;"}
 `;

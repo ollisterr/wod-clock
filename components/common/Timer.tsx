@@ -7,7 +7,8 @@ import React, {
 } from "react";
 import { Vibration } from "react-native";
 
-import { IconButton, TimeInput } from ".";
+import TimeInput from "./TimeInput";
+import { IconButton } from "./Button";
 import { CENTSECOND, HOUR, MINUTE, SECOND } from "../../constants/time";
 import { useSettings } from "../../contexts/SettingsContext";
 import useTime from "../../hooks/useTime";
@@ -20,6 +21,7 @@ import {
   timeComponentsToMilliseconds,
 } from "../../utils/time.utils";
 import Countdown from "../Countdown";
+import { range } from "../../utils/utils";
 
 interface Props {
   startTime?: number;
@@ -28,6 +30,8 @@ interface Props {
   showCentseconds?: boolean;
   editable?: boolean;
   intervalLength?: number;
+  onStart?: () => void;
+  onPause?: () => void;
   onReset?: () => void;
   onTimeEnd?: () => void | boolean;
   rounds?: number;
@@ -46,6 +50,7 @@ const Timer = forwardRef(
       showCentseconds = !showHours,
       editable = true,
       onReset,
+      onPause,
       ...props
     }: Props,
     ref
@@ -74,7 +79,10 @@ const Timer = forwardRef(
       startValue: timeInMs,
       resetValue,
       countDown,
-      onPause: setTime,
+      onPause: (time) => {
+        setTime(time);
+        onPause?.();
+      },
       onReset: countDown ? () => setTime(resetValue) : undefined,
       ...props,
     });
@@ -90,13 +98,13 @@ const Timer = forwardRef(
         vibrationEnabled &&
         isRunning &&
         countDown &&
-        [0, 1, 2, 3, 4, 5].includes(components.seconds) &&
+        range(5).includes(components.seconds) &&
         components.minutes === 0 &&
         components.hours === 0
       ) {
         Vibration.vibrate();
       }
-    }, [time, isRunning, vibrationEnabled]);
+    }, [timeBreakdown(time).seconds, isRunning, vibrationEnabled]);
 
     useImperativeHandle(ref, () => ({
       setTime: reset,

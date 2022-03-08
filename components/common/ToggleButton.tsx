@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animated } from "react-native";
+import { Animated, Easing } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import styled from "../../styles";
 import theme from "../../styles/theme";
@@ -16,18 +16,21 @@ export default function ToggleButton({ value, onChange }: Props) {
   const position = useRef(new Animated.Value(value ? 1 : 0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(color, {
-        toValue: value ? 1 : 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(position, {
-        toValue: value ? 1 : 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    requestAnimationFrame(() => {
+      Animated.parallel([
+        Animated.timing(color, {
+          toValue: value ? 1 : 0,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+        Animated.timing(position, {
+          toValue: value ? 1 : 0,
+          duration: 200,
+          easing: Easing.inOut(Easing.linear),
+          useNativeDriver: true,
+        }),
+      ]).start();
+    });
   }, [value]);
 
   const backgroundColor = color.interpolate({
@@ -50,9 +53,8 @@ export default function ToggleButton({ value, onChange }: Props) {
 }
 
 const Wrapper = styled(Animated.View)`
-  box-sizing: content-box;
-  width: ${HANDLE_SIZE * 2}px;
-  height: ${HANDLE_SIZE}px;
+  width: ${HANDLE_SIZE * 2 + 6}px;
+  height: ${HANDLE_SIZE + 6}px;
   border-radius: ${(p) => p.theme.borderRadius.pill};
   border: solid 3px ${(p) => p.theme.colors.grey};
 `;

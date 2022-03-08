@@ -8,3 +8,11 @@ export type Round = {
   repeats: number;
   cycles: SetType[];
 };
+
+export type Exercise = {
+  name: string;
+  timestamp: number;
+  sets: SetType[];
+};
+
+export type ExcerciseData = Record<string, Exercise>;
