@@ -13,7 +13,7 @@ import { CENTSECOND, HOUR, MINUTE, SECOND } from "../../constants/time";
 import { useSettings } from "../../contexts/SettingsContext";
 import useTime from "../../hooks/useTime";
 import styled from "../../styles";
-import { EvenRow } from "../../styles/styles";
+import { EvenRow, Text } from "../../styles/styles";
 import theme, { Color } from "../../styles/theme";
 import {
   timeBreakdown,
@@ -174,25 +174,33 @@ const Timer = forwardRef(
           )}
         </TimerWrapper>
 
+        {editable && <InfoText>Press to edit time</InfoText>}
+
         <EvenRow>
-          <IconButton onPress={() => stop()}>
+          <IconButton onPress={() => stop()} disabled={!isRunning}>
             <FontAwesome name="square" size={20} color={theme.colors.white} />
           </IconButton>
 
-          {isRunning ? (
-            <IconButton onPress={pause}>
-              <FontAwesome name="pause" size={20} color={theme.colors.white} />
-            </IconButton>
-          ) : (
-            <IconButton
-              onPress={onStartPress}
-              disabled={countDown && (timeInMs === 0 || time === 0)}
-            >
-              <FontAwesome name="play" size={20} color={theme.colors.white} />
-            </IconButton>
-          )}
+          <MiddleButtonWrapper>
+            {isRunning ? (
+              <IconButton onPress={pause}>
+                <FontAwesome
+                  name="pause"
+                  size={20}
+                  color={theme.colors.white}
+                />
+              </IconButton>
+            ) : (
+              <IconButton
+                onPress={onStartPress}
+                disabled={countDown && (timeInMs === 0 || time === 0)}
+              >
+                <FontAwesome name="play" size={20} color={theme.colors.white} />
+              </IconButton>
+            )}
+          </MiddleButtonWrapper>
 
-          <IconButton onPress={onResetPress}>
+          <IconButton onPress={onResetPress} disabled={time === resetValue}>
             <FontAwesome name="repeat" size={20} color={theme.colors.white} />
           </IconButton>
         </EvenRow>
@@ -205,15 +213,28 @@ export default Timer;
 
 const Wrapper = styled.View`
   width: 100%;
+  align-items: center;
 `;
 
 const TimerWrapper = styled.View`
   flex-direction: row;
   width: 100%;
-  padding: ${(p) => p.theme.spacing.medium} ${(p) => p.theme.spacing.small};
+  padding-horizontal: ${(p) => p.theme.spacing.xxsmall};
 `;
 
 const TimerText = styled.Text<{ color?: Color }>`
   ${(p) => p.theme.typography.timer}
   color: ${(p) => p.theme.colors[p.color ?? "peach"]};
+`;
+
+const MiddleButtonWrapper = styled.View`
+  padding-top: ${(p) => p.theme.spacing.xlarge};
+`;
+
+const InfoText = styled(Text)`
+  font-size: 12;
+  text-align: center;
+  padding-top: ${(p) => p.theme.spacing.xxsmall};
+  padding-bottom: ${(p) => p.theme.spacing.medium};
+  color: ${(p) => p.theme.colors.lightgrey};
 `;

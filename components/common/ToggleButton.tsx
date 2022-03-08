@@ -20,12 +20,12 @@ export default function ToggleButton({ value, onChange }: Props) {
       Animated.parallel([
         Animated.timing(color, {
           toValue: value ? 1 : 0,
-          duration: 300,
+          duration: 200,
           useNativeDriver: false,
         }),
         Animated.timing(position, {
           toValue: value ? 1 : 0,
-          duration: 200,
+          duration: 150,
           easing: Easing.inOut(Easing.linear),
           useNativeDriver: true,
         }),

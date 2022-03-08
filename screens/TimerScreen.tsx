@@ -5,7 +5,7 @@ import { Timer, ScreenWrapper } from "../components/common";
 export default function TimerScreen() {
   return (
     <ScreenWrapper>
-      <Timer showHours intervalLength={480} />
+      <Timer showHours intervalLength={100} />
     </ScreenWrapper>
   );
 }

@@ -11,7 +11,7 @@ const Spacer = styled.View<Props>`
   width: ${(p) =>
     (p.axis ?? "y") === "x" ? p.theme.spacing[p.spacing ?? "default"] : "100%"};
   height: ${(p) =>
-    (p.axis ?? "y") === "x" ? 1 : p.theme.spacing[p.spacing ?? "default"]};
+    (p.axis ?? "y") === "x" ? "1px" : p.theme.spacing[p.spacing ?? "default"]};
   ${(p) => p.fill && "flex: 1;"}
 `;
 

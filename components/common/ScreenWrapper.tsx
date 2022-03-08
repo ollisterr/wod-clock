@@ -4,6 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { ScrollView } from "react-native-gesture-handler";
 import styled from "../../styles";
 import theme from "../../styles/theme";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface Props {
   children: ReactNode;
@@ -11,8 +12,10 @@ interface Props {
 }
 
 export default function ScreenWrapper({ children, ...rest }: Props) {
+  const insets = useSafeAreaInsets();
+
   return (
-    <Wrapper>
+    <Wrapper style={{ paddingTop: insets.top }}>
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
