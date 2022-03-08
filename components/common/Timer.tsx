@@ -138,6 +138,8 @@ const Timer = forwardRef(
         setResetValue(timeComponentsToMilliseconds(newTime));
       };
 
+    const allowEditing = editable && !isRunning;
+
     return (
       <Wrapper>
         <TimerWrapper>
@@ -146,7 +148,7 @@ const Timer = forwardRef(
               <TimeInput
                 value={Math.floor(time / HOUR)}
                 onChange={setTimeComponent("hours")}
-                editable={editable}
+                editable={allowEditing}
               />
               <TimerText>:</TimerText>
             </>
@@ -154,13 +156,13 @@ const Timer = forwardRef(
           <TimeInput
             value={Math.floor(time / MINUTE) % 60}
             onChange={setTimeComponent("minutes")}
-            editable={editable}
+            editable={allowEditing}
           />
           <TimerText>:</TimerText>
           <TimeInput
             value={Math.floor(time / SECOND) % 60}
             onChange={setTimeComponent("seconds")}
-            editable={editable}
+            editable={allowEditing}
           />
           {showCentseconds && (
             <>
@@ -174,7 +176,9 @@ const Timer = forwardRef(
           )}
         </TimerWrapper>
 
-        {editable && <InfoText>Press to edit time</InfoText>}
+        {editable && (
+          <InfoText>{isRunning ? "Pause" : "Press"} to edit time</InfoText>
+        )}
 
         <EvenRow>
           <IconButton onPress={() => stop()} disabled={!isRunning}>
@@ -233,7 +237,7 @@ const MiddleButtonWrapper = styled.View`
 `;
 
 const InfoText = styled(Text)`
-  font-size: 12;
+  font-size: 12px;
   text-align: center;
   padding-top: ${(p) => p.theme.spacing.xxsmall};
   padding-bottom: ${(p) => p.theme.spacing.medium};
