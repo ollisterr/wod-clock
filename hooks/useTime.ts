@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { InteractionManager } from "react-native";
 
 export type Interval = 10 | 500 | 1000 | 60000;
 
@@ -15,7 +16,7 @@ interface Props {
 }
 
 export default function useTime(props?: Props) {
-  const intervalLength = props?.intervalLength ?? 101;
+  const intervalLength = props?.intervalLength ?? 71;
   const countDown = props?.countDown ?? false;
   const rounds = props?.rounds ?? 0;
 
@@ -30,16 +31,18 @@ export default function useTime(props?: Props) {
   const [interval, updateInterval] = useState<number>();
 
   const updateTime = useCallback(() => {
-    // compare to start date to get the exact time difference since last call
-    const timeDiff = Date.now() - startTimeStamp.current;
+    InteractionManager.runAfterInteractions(() => {
+      // compare to start date to get the exact time difference since last call
+      const timeDiff = Date.now() - startTimeStamp.current;
 
-    if (countDown) {
-      setTime(Math.max(startValue.current - timeDiff, 0));
-    } else {
-      // add on the given startValue, for example
-      // if the clock is continued from pause
-      setTime(startValue.current + timeDiff);
-    }
+      if (countDown) {
+        setTime(Math.max(startValue.current - timeDiff, 0));
+      } else {
+        // add on the given startValue, for example
+        // if the clock is continued from pause
+        setTime(startValue.current + timeDiff);
+      }
+    });
   }, [countDown]);
 
   const resetInterval = () => {
