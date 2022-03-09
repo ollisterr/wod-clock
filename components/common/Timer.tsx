@@ -11,7 +11,7 @@ import TimeInput from "./TimeInput";
 import { IconButton } from "./Button";
 import { CENTSECOND, HOUR, MINUTE, SECOND } from "../../constants/time";
 import { useSettings } from "../../contexts/SettingsContext";
-import useTime from "../../hooks/useTime";
+import useTimer from "../../hooks/useTimer";
 import styled from "../../styles";
 import { EvenRow, Text } from "../../styles/styles";
 import theme, { Color } from "../../styles/theme";
@@ -75,7 +75,7 @@ const Timer = forwardRef(
 
     const setTime = (time: number) => setTimeComponents(timeBreakdown(time));
 
-    const { time, reset, start, pause, stop, isRunning } = useTime({
+    const { time, reset, start, pause, stop, isRunning } = useTimer({
       startValue: timeInMs,
       resetValue,
       countDown,

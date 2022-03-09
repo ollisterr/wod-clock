@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { View } from "react-native";
 import { SECOND } from "../constants/time";
 
-import useTime from "../hooks/useTime";
+import useTimer from "../hooks/useTimer";
 import { Text } from "../styles/styles";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function Countdown({ length, onFinish }: Props) {
-  const { start, time, reset } = useTime({
+  const { start, time, reset } = useTimer({
     startValue: length * SECOND,
     countDown: true,
     onTimeEnd: () => {
