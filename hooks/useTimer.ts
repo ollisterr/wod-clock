@@ -1,40 +1,46 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { InteractionManager } from "react-native";
-import { Timer } from "../modules/Timer";
+import { Timer, TimerAttributes } from "../modules/Timer";
 
 export type Interval = 10 | 500 | 1000 | 60000;
 
-interface Props {
-  startValue?: number;
+export interface TimerProps extends TimerAttributes {
   resetValue?: number;
   intervalLength?: number;
-  countDown?: boolean;
-  onPause?: (time: number) => void;
   onStart?: () => void;
+  onPause?: (time: number) => void;
+  onStop?: () => void;
   onReset?: () => void;
-  onTimeEnd?: () => void;
+  onTimeEnd?: () => void | { endTime?: number; stop?: boolean };
   rounds?: number;
 }
 
-export default function useTimer(props?: Props) {
-  const intervalLength = props?.intervalLength ?? 123;
-  const countDown = props?.countDown ?? false;
-  const rounds = props?.rounds ?? 0;
-
-  const timer = useRef(
-    new Timer({
-      name: "kakka",
-      startValue: props?.startValue,
-      countdown: countDown,
-    })
-  ).current;
+export default function useTimer({
+  intervalLength = 123,
+  rounds = 0,
+  startValue = 0,
+  resetValue = startValue,
+  countdown = true,
+  onStart,
+  onPause,
+  onStop,
+  onReset,
+  onTimeEnd,
+  ...props
+}: TimerProps) {
+  const timer = useRef(new Timer({ ...props, countdown, startValue })).current;
 
   // time in milliseconds
-  const [time, setTime] = useState(props?.startValue ?? 0);
+  const [time, setTime] = useState(0);
   const [interval, updateInterval] = useState<number>();
 
-  const updateTime = useCallback(() => {
+  const isRunning = useMemo(() => !!interval, [interval]);
+
+  const updateTime = useCallback((newTime?: number) => {
     InteractionManager.runAfterInteractions(() => {
+      if (newTime !== undefined) {
+        timer.setTime(newTime);
+      }
       setTime(Math.max(0, timer.getTime()));
     });
   }, []);
@@ -50,19 +56,19 @@ export default function useTimer(props?: Props) {
   }, []);
 
   useEffect(() => {
-    if (props?.startValue === undefined) return;
+    // allow update value only if the timer is running
+    if (isRunning) return;
 
     // programmatically update current time if start value is changed
-    timer.setTime(props.startValue);
-    updateTime();
-  }, [props?.startValue]);
+    updateTime(startValue);
+  }, [startValue]);
 
   useEffect(() => {
-    if (props?.resetValue === undefined) return;
+    if (resetValue) return;
 
     // programmatically update current time if start value is changed
-    timer.setResetTime(props.resetValue);
-  }, [props?.resetValue]);
+    timer.setResetTime(resetValue);
+  }, [resetValue]);
 
   const pause = useCallback(() => {
     // clear interval to stop the clock
@@ -71,7 +77,7 @@ export default function useTimer(props?: Props) {
     timer.pause();
     updateTime();
 
-    if (props?.onPause) props.onPause(timer.getTime());
+    onPause?.(timer.getTime());
   }, []);
 
   const reset = useCallback(
@@ -84,14 +90,17 @@ export default function useTimer(props?: Props) {
 
       updateTime();
 
-      props?.onReset?.();
+      onReset?.();
     },
-    [props?.onReset, updateTime]
+    [onReset, updateTime]
   );
 
   const stop = useCallback(
     (newTime?: number) => {
+      console.log("Stopping...");
       resetInterval();
+
+      onStop?.();
 
       if (newTime !== undefined) {
         timer.pause();
@@ -100,21 +109,27 @@ export default function useTimer(props?: Props) {
         timer.stop();
       }
 
-      reset(newTime);
+      updateTime();
     },
-    [pause, reset]
+    [pause, reset, onStop]
   );
 
   useEffect(() => {
     if (timer.countdown && time === 0 && timer.isRunning) {
-      props?.onTimeEnd?.();
+      console.log("Time end...", time, timer.getTime(), timer.isRunning);
+      const newState = onTimeEnd?.();
+
+      if (newState?.endTime !== undefined) {
+        timer.setTime(newState.endTime);
+        setTime(newState.endTime);
+      }
 
       // stop clock triggered on round finish
-      if (rounds === 0) {
+      if (newState?.stop || rounds === 0) {
         stop(0);
       }
     }
-  }, [time, stop, rounds]);
+  }, [time, stop, rounds, onTimeEnd]);
 
   const start = useCallback(() => {
     // clear existing running intervals
@@ -126,8 +141,8 @@ export default function useTimer(props?: Props) {
     const newInterval = window.setInterval(updateTime, intervalLength);
     updateInterval(newInterval);
 
-    props?.onStart?.();
-  }, [interval, intervalLength, updateTime, props?.onStart]);
+    onStart?.();
+  }, [interval, intervalLength, updateTime, onStart]);
 
   return {
     time,
@@ -135,6 +150,6 @@ export default function useTimer(props?: Props) {
     start,
     stop,
     reset,
-    isRunning: !!interval,
+    isRunning,
   };
 }

@@ -11,7 +11,7 @@ import TimeInput from "./TimeInput";
 import { IconButton } from "./Button";
 import { CENTSECOND, HOUR, MINUTE, SECOND } from "../../constants/time";
 import { useSettings } from "../../contexts/SettingsContext";
-import useTimer from "../../hooks/useTimer";
+import useTimer, { TimerProps } from "../../hooks/useTimer";
 import styled from "../../styles";
 import { EvenRow, Text } from "../../styles/styles";
 import theme, { Color } from "../../styles/theme";
@@ -23,18 +23,12 @@ import {
 import Countdown from "../Countdown";
 import { range } from "../../utils/utils";
 
-interface Props {
+interface Props extends TimerProps {
   startTime?: number;
-  countDown?: boolean;
   showHours?: boolean;
   showCentseconds?: boolean;
   editable?: boolean;
-  intervalLength?: number;
-  onStart?: () => void;
-  onPause?: () => void;
-  onReset?: () => void;
-  onTimeEnd?: () => void | boolean;
-  rounds?: number;
+  onPause?: (time?: number) => void;
 }
 
 interface Timer {
@@ -45,7 +39,7 @@ const Timer = forwardRef(
   (
     {
       startTime = 0,
-      countDown = true,
+      countdown = true,
       showHours = false,
       showCentseconds = !showHours,
       editable = true,
@@ -78,12 +72,12 @@ const Timer = forwardRef(
     const { time, reset, start, pause, stop, isRunning } = useTimer({
       startValue: timeInMs,
       resetValue,
-      countDown,
+      countdown,
       onPause: (time) => {
         setTime(time);
-        onPause?.();
+        onPause?.(time);
       },
-      onReset: countDown ? () => setTime(resetValue) : undefined,
+      onReset: countdown ? () => setTime(resetValue) : undefined,
       ...props,
     });
 
@@ -97,7 +91,7 @@ const Timer = forwardRef(
       if (
         vibrationEnabled &&
         isRunning &&
-        countDown &&
+        countdown &&
         range(5).includes(components.seconds) &&
         components.minutes === 0 &&
         components.hours === 0
@@ -197,7 +191,7 @@ const Timer = forwardRef(
             ) : (
               <IconButton
                 onPress={onStartPress}
-                disabled={countDown && (timeInMs === 0 || time === 0)}
+                disabled={countdown && (timeInMs === 0 || time === 0)}
               >
                 <FontAwesome name="play" size={20} color={theme.colors.white} />
               </IconButton>

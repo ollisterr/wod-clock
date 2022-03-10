@@ -12,8 +12,9 @@ interface Props {
 
 export default function Countdown({ length, onFinish }: Props) {
   const { start, time, reset } = useTimer({
+    name: "countdown",
     startValue: length * SECOND,
-    countDown: true,
+    countdown: true,
     onTimeEnd: () => {
       onFinish?.();
       reset();

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
 
 import {
@@ -25,20 +25,23 @@ export default function SetsScreen() {
   const [activeSet, setActiveSet] = useState<number>(0);
   const [isRunning, setIsRunning] = useState(false);
 
-  const timerRef = useRef<Timer>();
-
   const onSetEnd = () => {
     const nextSetIndex = (activeSet + 1) % sets.length;
-    setActiveSet(nextSetIndex);
 
     if (nextSetIndex === 0) {
-      setRounds((x) => Math.max(x - 1, 0));
+      if (rounds === 1) {
+        // return true for stop clock
+        return { stop: true };
+      } else {
+        // decrease rounds
+        setActiveSet(nextSetIndex);
+        setRounds((x) => Math.max(x - 1, 0));
+      }
     }
-    if (nextSetIndex === 0 && rounds === 1) {
-      timerRef.current?.setTime(0);
-    } else {
-      timerRef.current?.setTime(sets[nextSetIndex].duration);
-    }
+    // update active set only if it's not the last set of the last round
+    setActiveSet(nextSetIndex);
+
+    return { endTime: sets[nextSetIndex].duration };
   };
 
   const addSet = () => {
@@ -64,7 +67,7 @@ export default function SetsScreen() {
 
       <TimerWrapper>
         <Timer
-          ref={timerRef}
+          name="sets"
           editable={false}
           showCentseconds
           rounds={rounds}
@@ -72,6 +75,7 @@ export default function SetsScreen() {
           onTimeEnd={onSetEnd}
           onStart={() => setIsRunning(true)}
           onPause={() => setIsRunning(false)}
+          onStop={() => setIsRunning(false)}
           onReset={onReset}
         />
       </TimerWrapper>
@@ -98,7 +102,7 @@ export default function SetsScreen() {
 
             <Input
               value={duration.toString()}
-              onChangeText={(x) => Number(x) && setDuration(Number(x))}
+              onChangeText={(x) => setDuration(Number(x) || 0)}
               keyboardType="number-pad"
               alignRight
             />

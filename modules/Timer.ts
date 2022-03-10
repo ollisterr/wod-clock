@@ -1,4 +1,4 @@
-interface TimerAttributes {
+export interface TimerAttributes {
   name: string;
   startValue?: number;
   referenceTime?: number;
@@ -67,5 +67,6 @@ export class Timer {
   setTime(time: number) {
     this.startValue = time;
     this.referenceTime = Date.now();
+    console.log("Setting timer", time);
   }
 }
