@@ -17,7 +17,7 @@ export interface TimerProps extends TimerAttributes {
 
 export default function useTimer({
   intervalLength = 123,
-  rounds = 0,
+  rounds = 1,
   startValue = 0,
   resetValue = startValue,
   countdown = true,
@@ -31,7 +31,7 @@ export default function useTimer({
   const timer = useRef(new Timer({ ...props, countdown, startValue })).current;
 
   // time in milliseconds
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(startValue);
   const [interval, updateInterval] = useState<number>();
 
   const isRunning = useMemo(() => !!interval, [interval]);

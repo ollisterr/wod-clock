@@ -67,6 +67,5 @@ export class Timer {
   setTime(time: number) {
     this.startValue = time;
     this.referenceTime = Date.now();
-    console.log("Setting timer", time);
   }
 }

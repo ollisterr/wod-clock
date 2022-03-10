@@ -112,6 +112,16 @@ const Timer = forwardRef(
     const onStartPress = () =>
       countdownEnabled && time === resetValue ? setShouldStart(true) : start();
 
+    const setTimeComponent =
+      (component: keyof TimeComponents) => (newValue: number) => {
+        const newTime = { ...timeComponents, [component]: newValue };
+        setTimeComponents(newTime);
+        // set new reset value when inputs are manually changed
+        setResetValue(timeComponentsToMilliseconds(newTime));
+      };
+
+    const allowEditing = editable && !isRunning;
+
     if (shouldStart && countdownEnabled && time === resetValue) {
       return (
         <Countdown
@@ -123,16 +133,6 @@ const Timer = forwardRef(
         />
       );
     }
-
-    const setTimeComponent =
-      (component: keyof TimeComponents) => (newValue: number) => {
-        const newTime = { ...timeComponents, [component]: newValue };
-        setTimeComponents(newTime);
-        // set new reset value when inputs are manually changed
-        setResetValue(timeComponentsToMilliseconds(newTime));
-      };
-
-    const allowEditing = editable && !isRunning;
 
     return (
       <Wrapper>
