@@ -122,20 +122,18 @@ const Timer = forwardRef(
 
     const allowEditing = editable && !isRunning;
 
-    if (shouldStart && countdownEnabled && time === resetValue) {
-      return (
+    return (
+      <Wrapper>
         <Countdown
+          running={shouldStart && countdownEnabled && time === resetValue}
           length={countdownLength}
           onFinish={() => {
             setShouldStart(false);
             start();
           }}
+          onCancel={() => setShouldStart(false)}
         />
-      );
-    }
 
-    return (
-      <Wrapper>
         <TimerWrapper>
           {showHours && (
             <>

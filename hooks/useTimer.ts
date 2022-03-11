@@ -16,7 +16,7 @@ export interface TimerProps extends TimerAttributes {
 }
 
 export default function useTimer({
-  intervalLength = 123,
+  intervalLength = 79,
   rounds = 1,
   startValue = 0,
   resetValue = startValue,
@@ -46,8 +46,10 @@ export default function useTimer({
   }, []);
 
   const resetInterval = () => {
-    clearInterval(interval);
-    updateInterval(undefined);
+    updateInterval((interval) => {
+      window.clearInterval(interval);
+      return undefined;
+    });
   };
 
   useEffect(() => {
@@ -97,7 +99,6 @@ export default function useTimer({
 
   const stop = useCallback(
     (newTime?: number) => {
-      console.log("Stopping...");
       resetInterval();
 
       onStop?.();
@@ -116,7 +117,6 @@ export default function useTimer({
 
   useEffect(() => {
     if (timer.countdown && time === 0 && timer.isRunning) {
-      console.log("Time end...", time, timer.getTime(), timer.isRunning);
       const newState = onTimeEnd?.();
 
       if (newState?.endTime !== undefined) {
@@ -133,12 +133,14 @@ export default function useTimer({
 
   const start = useCallback(() => {
     // clear existing running intervals
-    if (interval) resetInterval();
+    resetInterval();
 
     timer.start();
     updateTime();
 
-    const newInterval = window.setInterval(updateTime, intervalLength);
+    const newInterval = window.setInterval(() => {
+      updateTime();
+    }, intervalLength);
     updateInterval(newInterval);
 
     onStart?.();
