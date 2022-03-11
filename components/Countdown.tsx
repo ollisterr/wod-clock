@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { SECOND } from "../constants/time";
+import { useSettings } from "../contexts/SettingsContext";
 
 import useTimer from "../hooks/useTimer";
 import styled from "../styles";
@@ -14,22 +15,17 @@ import { timeBreakdown } from "../utils/time.utils";
 
 interface Props {
   running: boolean;
-  length: number;
   onFinish?: () => void;
   onCancel?: () => void;
 }
 
-export default function Countdown({
-  running,
-  onCancel,
-  length,
-  onFinish,
-}: Props) {
+export default function Countdown({ running, onCancel, onFinish }: Props) {
+  const { countdownLength } = useSettings();
+
   const { start, time, stop } = useTimer({
     name: "countdown",
-    startValue: length * SECOND,
+    startValue: countdownLength * SECOND,
     intervalLength: 100,
-    countdown: true,
     onTimeEnd: onFinish,
   });
 
@@ -47,7 +43,7 @@ export default function Countdown({
   const { seconds } = timeBreakdown(time);
 
   useEffect(() => {
-    scale.value = 150;
+    scale.value = 200;
     scale.value = withTiming(100, {
       duration: 200,
       easing: Easing.out(Easing.linear),
@@ -88,5 +84,5 @@ const Backdrop = styled.TouchableOpacity`
   width: 100%;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.4);
 `;
