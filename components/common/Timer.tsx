@@ -3,9 +3,11 @@ import React, {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useState,
 } from "react";
 import { Vibration } from "react-native";
+import { observer } from "mobx-react-lite";
 
 import TimeInput from "./TimeInput";
 import { IconButton } from "./Button";
@@ -44,17 +46,11 @@ const Timer = forwardRef(
       showCentseconds = !showHours,
       editable = true,
       onReset,
-      onPause,
       ...props
     }: Props,
     ref
   ) => {
-    const {
-      vibrationEnabled,
-      audioEnabled,
-      countdownEnabled,
-      countdownLength,
-    } = useSettings();
+    const { vibrationEnabled, countdownEnabled } = useSettings();
 
     const [shouldStart, setShouldStart] = useState(false);
     const [timeComponents, setTimeComponents] = useState<TimeComponents>({
@@ -65,29 +61,31 @@ const Timer = forwardRef(
     });
     const [resetValue, setResetValue] = useState(startTime);
 
-    const timeInMs = timeComponentsToMilliseconds(timeComponents);
-
-    const setTime = (time: number) => setTimeComponents(timeBreakdown(time));
+    // avoid update loop between useTimer's startValue and time
+    const timeInMs = useMemo(
+      () => timeComponentsToMilliseconds(timeComponents),
+      [timeComponents]
+    );
 
     const { time, reset, start, pause, stop, isRunning } = useTimer({
       startValue: timeInMs,
       resetValue,
       countdown,
-      onPause: (time) => {
-        setTime(time);
-        onPause?.(time);
-      },
-      onReset: countdown ? () => setTime(resetValue) : undefined,
       ...props,
     });
 
     useEffect(() => {
-      setTime(startTime);
-      setResetValue(startTime);
-    }, [startTime]);
+      console.log("RUNNING: ", isRunning);
+    }, [isRunning]);
+
+    useEffect(() => {
+      setTimeComponents(timeBreakdown(startTime));
+      setResetValue(props.resetValue ?? startTime);
+    }, [startTime, props.resetValue]);
 
     useEffect(() => {
       const components = timeBreakdown(time);
+
       if (
         vibrationEnabled &&
         isRunning &&
@@ -124,14 +122,16 @@ const Timer = forwardRef(
 
     return (
       <Wrapper>
-        <Countdown
-          running={shouldStart && countdownEnabled && time === resetValue}
-          onFinish={() => {
-            setShouldStart(false);
-            start();
-          }}
-          onCancel={() => setShouldStart(false)}
-        />
+        {shouldStart && (
+          <Countdown
+            running={shouldStart && countdownEnabled && time === resetValue}
+            onFinish={() => {
+              setShouldStart(false);
+              start();
+            }}
+            onCancel={() => setShouldStart(false)}
+          />
+        )}
 
         <TimerWrapper>
           {showHours && (
@@ -204,7 +204,7 @@ const Timer = forwardRef(
   }
 );
 
-export default Timer;
+export default observer(Timer);
 
 const Wrapper = styled.View`
   width: 100%;

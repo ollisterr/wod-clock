@@ -8,6 +8,7 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
 import { ColorSchemeName } from "react-native";
+import { observer } from "mobx-react-lite";
 
 import NotFoundScreen from "../screens/NotFoundScreen";
 import SetsScreen from "../screens/SetsScreen";
@@ -17,21 +18,22 @@ import TimerScreen from "../screens/TimerScreen";
 import theme from "../styles/theme";
 import { RootStackParamList, RootTabParamList } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
+import { store } from "../modules/store";
 
-export default function Navigation({
-  colorScheme,
-}: {
-  colorScheme: ColorSchemeName;
-}) {
-  return (
+const Navigation = ({ colorScheme }: { colorScheme: ColorSchemeName }) => {
+  const { isReady } = store;
+
+  return isReady ? (
     <NavigationContainer
       linking={LinkingConfiguration}
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
     >
       <RootNavigator />
     </NavigationContainer>
-  );
-}
+  ) : null;
+};
+
+export default observer(Navigation);
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

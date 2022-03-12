@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 
 import { EvenRow, Text } from "../styles/styles";
-import { getExercises } from "../utils/set.utils";
+import { getExercises } from "../utils/timer.utils";
 import Modal from "./common/Modal";
 import { ExcerciseData, Exercise } from "./types";
 

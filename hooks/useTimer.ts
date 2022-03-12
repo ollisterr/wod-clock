@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { InteractionManager } from "react-native";
-import { Timer, TimerAttributes } from "../modules/Timer";
+import { store } from "../modules/store";
+import { autorun } from "mobx";
+
+import { TimerAttributes } from "../modules/Timer";
 
 export type Interval = 10 | 500 | 1000 | 60000;
 
 export interface TimerProps extends TimerAttributes {
-  resetValue?: number;
   intervalLength?: number;
   onStart?: () => void;
   onPause?: (time: number) => void;
@@ -15,26 +17,23 @@ export interface TimerProps extends TimerAttributes {
   rounds?: number;
 }
 
-export default function useTimer({
+const useTimer = ({
   intervalLength = 79,
   rounds = 1,
   startValue = 0,
   resetValue = startValue,
-  countdown = true,
   onStart,
   onPause,
   onStop,
   onReset,
   onTimeEnd,
   ...props
-}: TimerProps) {
-  const timer = useRef(new Timer({ ...props, countdown, startValue })).current;
+}: TimerProps) => {
+  let timer = useRef(store.getTimer({ ...props, startValue })).current;
 
   // time in milliseconds
   const [time, setTime] = useState(startValue);
   const [interval, updateInterval] = useState<number>();
-
-  const isRunning = useMemo(() => !!interval, [interval]);
 
   const updateTime = useCallback((newTime?: number) => {
     InteractionManager.runAfterInteractions(() => {
@@ -53,22 +52,27 @@ export default function useTimer({
   };
 
   useEffect(() => {
+    const disposer = autorun(
+      () => (timer = store.getTimer({ ...props, startValue }))
+    );
+
     // clear interval on unmount
-    return resetInterval;
+    return () => {
+      resetInterval();
+      disposer();
+    };
   }, []);
 
   useEffect(() => {
     // allow update value only if the timer is running
-    if (isRunning) return;
+    if (timer.isRunning) return;
 
     // programmatically update current time if start value is changed
     updateTime(startValue);
   }, [startValue]);
 
   useEffect(() => {
-    if (resetValue) return;
-
-    // programmatically update current time if start value is changed
+    // programmatically update reset time if it or startValue was updated
     timer.setResetTime(resetValue);
   }, [resetValue]);
 
@@ -101,8 +105,6 @@ export default function useTimer({
     (newTime?: number) => {
       resetInterval();
 
-      onStop?.();
-
       if (newTime !== undefined) {
         timer.pause();
         timer.setTime(newTime);
@@ -111,6 +113,8 @@ export default function useTimer({
       }
 
       updateTime();
+
+      onStop?.();
     },
     [pause, reset, onStop]
   );
@@ -131,27 +135,50 @@ export default function useTimer({
     }
   }, [time, stop, rounds, onTimeEnd]);
 
-  const start = useCallback(() => {
-    // clear existing running intervals
-    resetInterval();
+  const start = useCallback(
+    (startFrom?: number) => {
+      // clear existing running intervals
+      resetInterval();
 
-    timer.start();
-    updateTime();
-
-    const newInterval = window.setInterval(() => {
+      timer.start(startFrom);
       updateTime();
-    }, intervalLength);
-    updateInterval(newInterval);
 
-    onStart?.();
-  }, [interval, intervalLength, updateTime, onStart]);
+      const newInterval = window.setInterval(() => {
+        updateTime();
+      }, intervalLength);
+      updateInterval(newInterval);
+
+      onStart?.();
+    },
+    [interval, intervalLength, updateTime, onStart]
+  );
+
+  useEffect(() => {
+    if (timer.isRunning) {
+      console.log(
+        "Updating timer reference with ID:",
+        timer.name,
+        timer.getTime()
+      );
+
+      if (timer.countdown && timer.getTime() < 0) {
+        // if timer has exceeded time limit since last update, pause it
+        pause();
+      } else {
+        // otherwise, continue timer by starting interval
+        start(timer.getTime());
+      }
+    }
+  }, [timer]);
 
   return {
+    ...timer,
     time,
     pause,
     start,
     stop,
     reset,
-    isRunning,
   };
-}
+};
+
+export default useTimer;

@@ -1,17 +1,29 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ThemeProvider } from "./styles";
+import { observer } from "mobx-react-lite";
 
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
 import Navigation from "./navigation";
 import theme from "./styles/theme";
 import SettingsProvider from "./contexts/SettingsContext";
+import AppStateProvider from "./contexts/AppStateContext";
+import TimerProvider from "./contexts/TimerContext";
+import { store } from "./modules/store";
 
-export default function App() {
+function App() {
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
+
+  useEffect(() => {
+    store.loadTimers();
+  }, []);
+
+  useEffect(() => {
+    console.log(">", store.timers);
+  }, [store.timers]);
 
   if (!isLoadingComplete) {
     return null;
@@ -19,13 +31,19 @@ export default function App() {
     return (
       <ThemeProvider theme={theme}>
         <SafeAreaProvider>
-          <SettingsProvider>
-            <Navigation colorScheme={colorScheme} />
+          <AppStateProvider>
+            <SettingsProvider>
+              <TimerProvider>
+                <Navigation colorScheme={colorScheme} />
 
-            <StatusBar style="light" />
-          </SettingsProvider>
+                <StatusBar style="light" />
+              </TimerProvider>
+            </SettingsProvider>
+          </AppStateProvider>
         </SafeAreaProvider>
       </ThemeProvider>
     );
   }
 }
+
+export default observer(App);

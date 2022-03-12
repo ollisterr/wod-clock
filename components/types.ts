@@ -1,3 +1,5 @@
+import { Timer } from "../modules/Timer";
+
 export type SetType = {
   name: string;
   duration: number;
@@ -16,3 +18,5 @@ export type Exercise = {
 };
 
 export type ExcerciseData = Record<string, Exercise>;
+
+export type TimerStore = Record<string, Timer>;

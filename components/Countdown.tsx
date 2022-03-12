@@ -13,7 +13,7 @@ import { useSettings } from "../contexts/SettingsContext";
 import useTimer from "../hooks/useTimer";
 import styled from "../styles";
 import { timeBreakdown } from "../utils/time.utils";
-import { Spacer } from "./common";
+import Spacer from "./common/Spacer";
 
 interface Props {
   running: boolean;
@@ -30,11 +30,6 @@ export default function Countdown({ running, onCancel, onFinish }: Props) {
     intervalLength: 100,
     onTimeEnd: onFinish,
   });
-
-  const cancel = () => {
-    onCancel?.();
-    stop();
-  };
 
   const scale = useSharedValue(100);
 
@@ -67,7 +62,7 @@ export default function Countdown({ running, onCancel, onFinish }: Props) {
       // make unpressable when hidden
       pointerEvents={running ? "auto" : "none"}
     >
-      <Backdrop onPress={cancel} activeOpacity={1}>
+      <Backdrop onPress={onCancel} activeOpacity={1}>
         {/* increment by 1 to not show zero value */}
         <CountdownText style={animatedStyles}>{seconds + 1}</CountdownText>
 

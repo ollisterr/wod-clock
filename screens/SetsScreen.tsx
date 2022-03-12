@@ -15,7 +15,6 @@ import { SECOND } from "../constants/time";
 import styled from "../styles";
 import { EvenRow, Input, Text } from "../styles/styles";
 import theme from "../styles/theme";
-import { openExercise } from "../utils/set.utils";
 
 export default function SetsScreen() {
   const [rounds, setRounds] = useState(1);
