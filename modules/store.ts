@@ -20,20 +20,27 @@ export const store = observable<Store>({
   isReady: false,
   async loadTimers() {
     const timerData = await loadTimers();
-    console.log("Loading timers:", timerData.map((x) => x.name).join(", "));
-    runInAction(() => {
-      this.timers = formatTimers(timerData);
-      this.isReady = true;
-    });
+
+    if (timerData.length > 0) {
+      console.log("Loading timers:", timerData.map((x) => x.name).join(", "));
+      runInAction(() => {
+        this.timers = formatTimers(timerData);
+      });
+    }
+    runInAction(() => (this.isReady = true));
   },
   saveTimers() {
     const runningTimers = Object.values(this.timers).filter(
       (timer) => timer.isRunning
     );
-    console.log(
-      "Storing running timers:",
-      runningTimers.map((x) => x.name).join(", ")
-    );
+    if (runningTimers.length > 0) {
+      console.log(
+        "Storing running timers:",
+        runningTimers.map((x) => x.name).join(", ")
+      );
+    }
+    // save timers even when there are no running ones
+    // in order to override old state
     storeTimers(runningTimers);
   },
   getTimer(timerData: TimerAttributes) {

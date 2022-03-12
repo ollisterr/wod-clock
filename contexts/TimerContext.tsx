@@ -21,7 +21,7 @@ const TimerProvider = observer(({ children }: Props) => {
   useEffect(() => {
     if (appState === "active") {
       store.loadTimers();
-    } else if (appState === "background") {
+    } else {
       store.saveTimers();
     }
   }, [appState]);

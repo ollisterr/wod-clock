@@ -20,7 +20,7 @@ interface Props {
 }
 
 export default function AppStateProvider({ children }: Props) {
-  const [appState, setAppState] = useState<AppStateStatus>("background");
+  const [appState, setAppState] = useState<AppStateStatus>("inactive");
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
   useEffect(() => {
@@ -76,4 +76,8 @@ export const useAppState = () => {
 };
 
 export const useIsInForeground = () => useAppState().isInForeground;
-export const useIsKeyboardOpen = () => useAppState().isKeyboardOpen;
+
+export const useIsKeyboardOpen = () => {
+  const { isKeyboardOpen } = useAppState();
+  return isKeyboardOpen;
+};

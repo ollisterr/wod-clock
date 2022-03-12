@@ -22,7 +22,7 @@ export interface TimerProps extends TimerAttributes {
 }
 
 const useTimer = ({
-  intervalLength = 79,
+  intervalLength = 97,
   rounds = 0,
   startValue = 0,
   resetValue = startValue,
@@ -48,11 +48,15 @@ const useTimer = ({
   const { startTick, stopTick, isRunning } = useTick({
     onTick: updateTime,
     tickInterval: intervalLength,
-    onIsRunningChange,
   });
 
   // time in milliseconds
   const [time, setTime] = useState(startValue);
+
+  useEffect(() => {
+    // trigger update
+    onIsRunningChange?.(isRunning);
+  }, [isRunning]);
 
   useEffect(() => {
     // allow update value only if the timer is running

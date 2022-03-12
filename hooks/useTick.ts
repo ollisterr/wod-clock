@@ -3,14 +3,9 @@ import { useEffect, useState } from "react";
 interface Props {
   tickInterval?: number;
   onTick: () => void;
-  onIsRunningChange?: (isRunning: boolean) => void;
 }
 
-export default function useTick({
-  tickInterval,
-  onTick,
-  onIsRunningChange,
-}: Props) {
+export default function useTick({ tickInterval, onTick }: Props) {
   const [interval, updateInterval] = useState<number>();
 
   useEffect(() => {
@@ -25,7 +20,6 @@ export default function useTick({
 
   const startTick = () =>
     updateInterval((interval) => {
-      onIsRunningChange?.(true);
       window.clearInterval(interval);
       const newInterval = window.setInterval(onTick, tickInterval);
       return newInterval;
@@ -33,7 +27,6 @@ export default function useTick({
 
   const stopTick = () =>
     updateInterval((interval) => {
-      onIsRunningChange?.(false);
       window.clearInterval(interval);
       return undefined;
     });
