@@ -27,10 +27,9 @@ export const store = observable<Store>({
     });
   },
   saveTimers() {
-    const runningTimers = Object.values(this.timers).filter((timer) => {
-      console.log(timer);
-      return timer.isRunning;
-    });
+    const runningTimers = Object.values(this.timers).filter(
+      (timer) => timer.isRunning
+    );
     console.log(
       "Storing running timers:",
       runningTimers.map((x) => x.name).join(", ")

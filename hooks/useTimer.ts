@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { InteractionManager } from "react-native";
 import { store } from "../modules/store";
 import { autorun } from "mobx";
 
 import { TimerAttributes } from "../modules/Timer";
+import { SECOND } from "../constants/time";
+import useTick from "./useTick";
+import { useFocusEffect } from "@react-navigation/native";
 
 export type Interval = 10 | 500 | 1000 | 60000;
 
@@ -31,10 +34,6 @@ const useTimer = ({
 }: TimerProps) => {
   let timer = useRef(store.getTimer({ ...props, startValue })).current;
 
-  // time in milliseconds
-  const [time, setTime] = useState(startValue);
-  const [interval, updateInterval] = useState<number>();
-
   const updateTime = useCallback((newTime?: number) => {
     InteractionManager.runAfterInteractions(() => {
       if (newTime !== undefined) {
@@ -44,24 +43,13 @@ const useTimer = ({
     });
   }, []);
 
-  const resetInterval = () => {
-    updateInterval((interval) => {
-      window.clearInterval(interval);
-      return undefined;
-    });
-  };
+  const { startTick, stopTick, isRunning } = useTick({
+    onTick: updateTime,
+    tickInterval: intervalLength,
+  });
 
-  useEffect(() => {
-    const disposer = autorun(
-      () => (timer = store.getTimer({ ...props, startValue }))
-    );
-
-    // clear interval on unmount
-    return () => {
-      resetInterval();
-      disposer();
-    };
-  }, []);
+  // time in milliseconds
+  const [time, setTime] = useState(startValue);
 
   useEffect(() => {
     // allow update value only if the timer is running
@@ -78,7 +66,7 @@ const useTimer = ({
 
   const pause = useCallback(() => {
     // clear interval to stop the clock
-    resetInterval();
+    stopTick();
 
     timer.pause();
     updateTime();
@@ -103,7 +91,7 @@ const useTimer = ({
 
   const stop = useCallback(
     (newTime?: number) => {
-      resetInterval();
+      stopTick();
 
       if (newTime !== undefined) {
         timer.pause();
@@ -137,47 +125,74 @@ const useTimer = ({
 
   const start = useCallback(
     (startFrom?: number) => {
-      // clear existing running intervals
-      resetInterval();
-
       timer.start(startFrom);
       updateTime();
 
-      const newInterval = window.setInterval(() => {
-        updateTime();
-      }, intervalLength);
-      updateInterval(newInterval);
+      startTick();
 
       onStart?.();
     },
-    [interval, intervalLength, updateTime, onStart]
+    [updateTime, onStart]
   );
 
   useEffect(() => {
-    if (timer.isRunning) {
+    const disposer = autorun(() => {
       console.log(
-        "Updating timer reference with ID:",
-        timer.name,
-        timer.getTime()
+        `> Updating timer reference with ID: ${timer.name} (${
+          timer.getTime() / SECOND
+        }s)`
       );
 
-      if (timer.countdown && timer.getTime() < 0) {
-        // if timer has exceeded time limit since last update, pause it
-        pause();
+      timer = store.getTimer({ ...props, startValue });
+
+      if (timer.isRunning) {
+        console.log(
+          `> ${props.name}: Timer should be running, starting ticking`
+        );
+        if (timer.countdown && timer.getTime() < 0) {
+          // if timer has exceeded time limit since last update, pause it
+          pause();
+        } else {
+          // otherwise, continue timer by starting interval
+          start(timer.getTime());
+        }
       } else {
-        // otherwise, continue timer by starting interval
-        start(timer.getTime());
+        // timer should not be running, stop ticking
+        stopTick();
       }
-    }
-  }, [timer]);
+    });
+
+    return () => {
+      // clear listeners
+      disposer();
+    };
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (timer.isRunning) {
+        // continue ticking on screen focus
+        startTick();
+      }
+
+      // stop ticking on screen blur
+      return () => {
+        console.log(
+          // eslint-disable-next-line max-len
+          `> ${props.name}: Screen is not focused, stop ticking to improve performance`
+        );
+        stopTick();
+      };
+    }, [])
+  );
 
   return {
-    ...timer,
     time,
     pause,
     start,
     stop,
     reset,
+    isRunning,
   };
 };
 

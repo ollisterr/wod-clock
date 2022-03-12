@@ -2,7 +2,7 @@ import React, { createContext, ReactNode, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 
 import { Timer } from "../modules/Timer";
-import { useIsInForeground } from "./AppStateContext";
+import { useAppState } from "./AppStateContext";
 import { store } from "../modules/store";
 
 interface TimerContext {
@@ -16,15 +16,15 @@ interface Props {
 }
 
 const TimerProvider = observer(({ children }: Props) => {
-  const isInForeground = useIsInForeground();
+  const { appState } = useAppState();
 
   useEffect(() => {
-    if (isInForeground) {
+    if (appState === "active") {
       store.loadTimers();
-    } else {
+    } else if (appState === "background") {
       store.saveTimers();
     }
-  }, [isInForeground]);
+  }, [appState]);
 
   return (
     <TimerContext.Provider value={{ getTimer: store.getTimer }}>

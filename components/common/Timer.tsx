@@ -75,10 +75,6 @@ const Timer = forwardRef(
     });
 
     useEffect(() => {
-      console.log("RUNNING: ", isRunning);
-    }, [isRunning]);
-
-    useEffect(() => {
       setTimeComponents(timeBreakdown(startTime));
       setResetValue(props.resetValue ?? startTime);
     }, [startTime, props.resetValue]);

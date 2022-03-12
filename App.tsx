@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ThemeProvider } from "./styles";
 import { observer } from "mobx-react-lite";
+import { Text } from "react-native";
 
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
@@ -21,12 +22,8 @@ function App() {
     store.loadTimers();
   }, []);
 
-  useEffect(() => {
-    console.log(">", store.timers);
-  }, [store.timers]);
-
-  if (!isLoadingComplete) {
-    return null;
+  if (!isLoadingComplete && store.isReady) {
+    return <Text>Loading</Text>;
   } else {
     return (
       <ThemeProvider theme={theme}>

@@ -49,19 +49,17 @@ export class Timer {
   }
 
   start(startFrom?: number) {
-    this.isRunning = true;
     // allow continuing timer from a determined value
     if (startFrom !== undefined) this.startValue = startFrom;
     this.referenceTime = Date.now();
-    console.log("isRunning", this.isRunning);
+    this.isRunning = true;
   }
 
   pause() {
     // isRunning must come last so that getTime returns correct value
-    this.isRunning = false;
     this.startValue = this.getTime();
     this.referenceTime = Date.now();
-    console.log("isRunning", this.isRunning);
+    this.isRunning = false;
   }
 
   reset() {
@@ -72,8 +70,6 @@ export class Timer {
   stop() {
     this.pause();
     this.reset();
-    this.isRunning = false;
-    console.log("isRunning", this.isRunning);
   }
 
   setTime(time: number) {
