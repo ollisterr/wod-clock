@@ -6,7 +6,7 @@ import { autorun } from "mobx";
 import { TimerAttributes } from "../modules/Timer";
 import { SECOND } from "../constants/time";
 import useTick from "./useTick";
-import { useFocusEffect } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 
 export type Interval = 10 | 500 | 1000 | 60000;
 
@@ -22,7 +22,7 @@ export interface TimerProps extends TimerAttributes {
 
 const useTimer = ({
   intervalLength = 79,
-  rounds = 1,
+  rounds = 0,
   startValue = 0,
   resetValue = startValue,
   onStart,
@@ -168,23 +168,20 @@ const useTimer = ({
     };
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (timer.isRunning) {
-        // continue ticking on screen focus
-        startTick();
-      }
+  const isFocused = useIsFocused();
 
-      // stop ticking on screen blur
-      return () => {
-        console.log(
-          // eslint-disable-next-line max-len
-          `> ${props.name}: Screen is not focused, stop ticking to improve performance`
-        );
-        stopTick();
-      };
-    }, [])
-  );
+  useEffect(() => {
+    if (isFocused && timer.isRunning) {
+      // continue ticking on screen focus
+      startTick();
+    } else {
+      console.log(
+        // eslint-disable-next-line max-len
+        `> ${props.name}: Screen is not focused, stop ticking to improve performance`
+      );
+      stopTick();
+    }
+  }, [isFocused]);
 
   return {
     time,

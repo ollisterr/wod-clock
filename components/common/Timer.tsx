@@ -90,7 +90,8 @@ const Timer = forwardRef(
         components.minutes === 0 &&
         components.hours === 0
       ) {
-        Vibration.vibrate();
+        // vibrate longer on the last second
+        Vibration.vibrate(components.seconds === 0 ? 1500 : undefined);
       }
     }, [timeBreakdown(time).seconds, isRunning, vibrationEnabled]);
 
