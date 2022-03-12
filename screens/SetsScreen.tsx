@@ -1,156 +1,156 @@
-import React, { useState } from "react";
-import { FontAwesome } from "@expo/vector-icons";
+import React, { useRef, useState } from "react";
 
-import {
-  ScreenWrapper,
-  Timer,
-  Set,
-  SpacedRow,
-  Spacer,
-  IconButton,
-} from "../components";
+import { ScreenWrapper, Timer, Set, Spacer } from "../components";
 import ExercisesModalButton from "../components/ExercisesModalButton";
 import { SetType } from "../components/types";
-import { SECOND } from "../constants/time";
 import styled from "../styles";
-import { EvenRow, Input, Text } from "../styles/styles";
-import theme from "../styles/theme";
+import {
+  Divider,
+  EvenRow,
+  Input,
+  Subtitle,
+  Text,
+  Title,
+} from "../styles/styles";
+import { ScrollView } from "react-native-gesture-handler";
+import { useIsKeyboardOpen } from "../contexts/AppStateContext";
 
 export default function SetsScreen() {
-  const [rounds, setRounds] = useState(1);
+  const [roundsInput, setRoundsInput] = useState(1);
+  const [currentRound, setCurrentRound] = useState(1);
   const [sets, setSets] = useState<SetType[]>([]);
-  const [name, setName] = useState("");
-  const [duration, setDuration] = useState(60);
+
   const [activeSet, setActiveSet] = useState<number>(0);
   const [isRunning, setIsRunning] = useState(false);
+
+  const listRef = useRef<ScrollView>(null);
+
+  const isKeyboardOpen = useIsKeyboardOpen();
 
   const onSetEnd = () => {
     const nextSetIndex = (activeSet + 1) % sets.length;
 
     if (nextSetIndex === 0) {
-      if (rounds === 1) {
+      if (currentRound === 1) {
         // return true for stop clock
         return { stop: true };
       } else {
         // decrease rounds
         setActiveSet(nextSetIndex);
-        setRounds((x) => Math.max(x - 1, 0));
+        setCurrentRound((x) => Math.max(x - 1, 0));
       }
     }
     // update active set only if it's not the last set of the last round
     setActiveSet(nextSetIndex);
+    listRef.current?.scrollTo({ x: 0, y: activeSet, animated: true });
 
     return { endTime: sets[nextSetIndex].duration };
-  };
-
-  const addSet = () => {
-    setSets((x) => [...x, { name, duration: duration * SECOND }]);
-    setDuration(60);
-    setName("");
   };
 
   const removeSet = (set: SetType) => {
     setSets(sets.filter((x) => x !== set));
   };
 
-  const clearSets = () => setSets([]);
-
   const onReset = () => {
     setActiveSet(0);
-    setRounds(1);
+    setCurrentRound(roundsInput);
   };
+
+  const setRounds = (input: string) => {
+    const rounds = Number(input) || 0;
+    setCurrentRound(rounds);
+    setRoundsInput(rounds);
+  };
+
+  const currentSet = sets[activeSet];
+  const nextSet = sets[(activeSet + 1) % sets.length];
 
   return (
     <ScreenWrapper noPadding>
-      <Spacer fill />
+      {!isKeyboardOpen && !isRunning && <Spacer fill />}
 
-      <TimerWrapper>
-        <Timer
-          name="sets"
-          editable={false}
-          showCentseconds
-          rounds={rounds}
-          startTime={sets[activeSet]?.duration ?? 0}
-          onTimeEnd={onSetEnd}
-          onStart={() => setIsRunning(true)}
-          onPause={() => setIsRunning(false)}
-          onStop={() => setIsRunning(false)}
-          onReset={onReset}
-        />
-      </TimerWrapper>
+      {isRunning && (
+        <Header>
+          <Subtitle typography="subtitle">Round {currentRound}</Subtitle>
+          <Title>{currentSet?.name}</Title>
 
-      <SetsWrapper keyboardShouldPersistTaps="handled">
-        {sets.map((set, i) => (
-          <Set
-            key={set.name}
-            isActive={isRunning && activeSet === i}
-            onRemove={() => removeSet(set)}
-            {...set}
+          <Divider spacing="small" />
+
+          <Subtitle typography="subtitle">Next round: {nextSet?.name}</Subtitle>
+        </Header>
+      )}
+
+      {!isKeyboardOpen && (
+        <TimerWrapper>
+          <Timer
+            name="sets"
+            editable={false}
+            showCentseconds
+            rounds={currentRound}
+            startTime={sets[activeSet]?.duration ?? 0}
+            onTimeEnd={onSetEnd}
+            onIsRunningChange={setIsRunning}
+            onReset={onReset}
           />
-        ))}
+        </TimerWrapper>
+      )}
 
-        <SetRow>
-          <SpacedRow>
-            <Input
-              value={name}
-              onChangeText={setName}
-              placeholder="New set..."
-              placeholderTextColor={theme.colors.grey}
-              fill
-            />
+      <SetRow>
+        <EvenRow>
+          <Subtitle>Custom rounds</Subtitle>
+
+          <BottomBarWrapper>
+            <Text>Rounds</Text>
+
+            <Spacer axis="x" />
 
             <Input
-              value={duration.toString()}
-              onChangeText={(x) => setDuration(Number(x) || 0)}
+              value={roundsInput.toString()}
+              onChangeText={setRounds}
               keyboardType="number-pad"
               alignRight
             />
+          </BottomBarWrapper>
+        </EvenRow>
+      </SetRow>
 
-            <Text>sec</Text>
-
-            <IconButton onPress={addSet} size="large" disabled={!name}>
-              <AddIcon name="plus" color={theme.colors.white} />
-            </IconButton>
-          </SpacedRow>
-        </SetRow>
+      <SetsWrapper
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ flexGrow: 1 }}
+        ref={listRef}
+      >
+        {sets.length > 0 ? (
+          sets.map((set, i) => (
+            <Set
+              key={set.name}
+              isActive={isRunning && activeSet === i}
+              onRemove={() => removeSet(set)}
+              showTools={!isRunning}
+              {...set}
+            />
+          ))
+        ) : (
+          <EmptySetsWrapper>
+            <ExercisesModalButton onSelect={({ sets }) => setSets(sets)}>
+              <Subtitle>Tap to add sets</Subtitle>
+            </ExercisesModalButton>
+          </EmptySetsWrapper>
+        )}
       </SetsWrapper>
-
-      <BottomBar>
-        <BottomBarWrapper>
-          <ExercisesModalButton onSelect={({ sets }) => setSets(sets)}>
-            <AddIcon name="close" color={theme.colors.white} />
-          </ExercisesModalButton>
-
-          <Spacer axis="x" />
-
-          <IconButton onPress={addSet} size="large" disabled={!sets.length}>
-            <AddIcon name="save" color={theme.colors.white} />
-          </IconButton>
-
-          <Spacer axis="x" />
-
-          <IconButton onPress={clearSets} size="large" disabled={!sets.length}>
-            <AddIcon name="trash" color={theme.colors.white} />
-          </IconButton>
-        </BottomBarWrapper>
-
-        <BottomBarWrapper>
-          <Text>Rounds</Text>
-
-          <Spacer axis="x" />
-
-          <Input
-            value={rounds.toString()}
-            onChangeText={(x) => Number(x) && setRounds(Number(x))}
-            keyboardType="number-pad"
-            alignRight
-            fill
-          />
-        </BottomBarWrapper>
-      </BottomBar>
     </ScreenWrapper>
   );
 }
+
+const Header = styled.View`
+  align-items: center;
+  padding-vertical: ${(p) => p.theme.spacing.default};
+`;
+
+const EmptySetsWrapper = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
 
 const TimerWrapper = styled.View`
   width: 100%;
@@ -159,10 +159,9 @@ const TimerWrapper = styled.View`
 
 const SetRow = styled.View`
   width: 100%;
-  padding: ${(p) => p.theme.spacing.default};
+  padding-horizontal: ${(p) => p.theme.spacing.default};
+  padding-vertical: ${(p) => p.theme.spacing.xsmall};
 `;
-
-const AddIcon = styled(FontAwesome)``;
 
 const SetsWrapper = styled.ScrollView`
   flex: 2;
@@ -170,16 +169,7 @@ const SetsWrapper = styled.ScrollView`
   padding-top: ${(p) => p.theme.spacing.default};
 `;
 
-const BottomBar = styled(EvenRow)`
-  width: 100%;
-  padding: ${(p) => p.theme.spacing.xsmall} ${(p) => p.theme.spacing.default};
-  justify-content: flex-end;
-  border-top-width: 1px;
-  border-top-color: ${(p) => p.theme.colors.grey};
-`;
-
 const BottomBarWrapper = styled.View`
-  flex: 1;
   flex-direction: row;
   align-items: center;
 `;

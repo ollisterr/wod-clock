@@ -12,9 +12,10 @@ import { SetType } from "./types";
 interface Props extends Required<SetType> {
   isActive: boolean;
   onRemove: () => void;
+  showTools: boolean;
 }
 
-export default function Set({ name, onRemove, ...rest }: Props) {
+export default function Set({ name, onRemove, showTools, ...rest }: Props) {
   return (
     <View>
       <Wrapper isActive={rest.isActive}>
@@ -22,15 +23,19 @@ export default function Set({ name, onRemove, ...rest }: Props) {
 
         <SetText>{rest.duration / SECOND} s</SetText>
 
-        <IconButton size="large" onPress={onRemove}>
-          <FontAwesome name="trash" color={theme.colors.white} />
-        </IconButton>
+        {showTools && (
+          <>
+            <IconButton size="large" onPress={onRemove}>
+              <FontAwesome name="trash" color={theme.colors.white} />
+            </IconButton>
 
-        <Spacer axis="x" />
+            <Spacer axis="x" />
 
-        <IconButton size="large">
-          <FontAwesome name="adjust" color={theme.colors.white} />
-        </IconButton>
+            <IconButton size="large">
+              <FontAwesome name="adjust" color={theme.colors.white} />
+            </IconButton>
+          </>
+        )}
       </Wrapper>
 
       <ProgressBar {...rest} />

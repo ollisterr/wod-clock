@@ -6,18 +6,24 @@ interface Props {
   children: ReactNode;
   isOpen: boolean;
   onClose: () => void;
+  noPadding?: boolean;
 }
 
-export default function ExercisesModal({ children, isOpen, onClose }: Props) {
+export default function ExercisesModal({
+  children,
+  isOpen,
+  onClose,
+  noPadding = false,
+}: Props) {
   return (
     <ModalWrapper
       visible={isOpen}
-      animationType="slide"
+      animationType="fade"
       transparent
       onRequestClose={onClose}
     >
       <Backdrop onPress={onClose} activeOpacity={1}>
-        <ContentWrapper>{children}</ContentWrapper>
+        <ContentWrapper noPadding={noPadding}>{children}</ContentWrapper>
       </Backdrop>
     </ModalWrapper>
   );
@@ -34,14 +40,16 @@ const Backdrop = styled.TouchableOpacity`
   width: 100%;
   padding: ${(p) => p.theme.spacing.default};
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.5);
 `;
 
 const ContentWrapper = styled.TouchableOpacity.attrs({
-  disabled: true,
   activeOpacity: 1,
-})`
+})<{ noPadding: boolean }>`
   width: 100%;
-  border-radius: ${(p) => p.theme.borderRadius};
-  padding: ${(p) => p.theme.spacing.default};
+  border-radius: ${(p) => p.theme.borderRadius.default};
+  ${(p) => !p.noPadding && `padding: ${p.theme.spacing.default};`}
+  background-color: ${(p) => p.theme.colors.black};
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+  elevation: 10;
 `;

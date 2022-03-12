@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { ScrollView } from "react-native-gesture-handler";
 import styled from "../../styles";
 import theme from "../../styles/theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -16,15 +15,7 @@ export default function ScreenWrapper({ children, ...rest }: Props) {
 
   return (
     <Wrapper style={{ paddingTop: insets.top }}>
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          flexGrow: 1,
-        }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <ContentWrapper {...rest}>{children}</ContentWrapper>
-      </ScrollView>
+      <ContentWrapper {...rest}>{children}</ContentWrapper>
     </Wrapper>
   );
 }

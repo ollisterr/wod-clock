@@ -1,8 +1,9 @@
+import { FontAwesome } from "@expo/vector-icons";
 import React, { ReactNode } from "react";
 import { TouchableNativeFeedbackProps } from "react-native";
 
 import styled from "../../styles";
-import { Spacing } from "../../styles/theme";
+import theme, { Spacing } from "../../styles/theme";
 
 interface Props extends TouchableNativeFeedbackProps {
   text?: string;
@@ -73,3 +74,9 @@ const IconWrapper = styled.View`
   align-items: center;
   justify-content: center;
 `;
+
+export const AddButton = ({ size = "large", ...props }: IconButtonProps) => (
+  <IconButton {...props} size={size}>
+    <FontAwesome name="plus" color={theme.colors.white} />
+  </IconButton>
+);

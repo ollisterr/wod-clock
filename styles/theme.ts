@@ -10,7 +10,7 @@ const theme = {
     peachGrey: "#d1b4ab",
 
     // greys
-    black: "#333",
+    black: "#222",
     grey: "#555",
     lightgrey: "#aaa",
     whitesmoke: "#ddd",
@@ -42,6 +42,18 @@ const theme = {
     body: css`
       font-family: "space-mono";
       font-size: ${px(16)};
+    `,
+    description: css`
+      font-family: "space-mono";
+      font-size: ${px(12)};
+    `,
+    title: css`
+      font-family: "space-mono";
+      font-size: ${px(32)};
+    `,
+    subtitle: css`
+      font-family: "space-mono";
+      font-size: ${px(14)};
     `,
   },
 };

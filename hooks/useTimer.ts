@@ -18,6 +18,7 @@ export interface TimerProps extends TimerAttributes {
   onReset?: () => void;
   onTimeEnd?: () => void | { endTime?: number; stop?: boolean };
   rounds?: number;
+  onIsRunningChange?: (isRunning: boolean) => void;
 }
 
 const useTimer = ({
@@ -30,6 +31,7 @@ const useTimer = ({
   onStop,
   onReset,
   onTimeEnd,
+  onIsRunningChange,
   ...props
 }: TimerProps) => {
   let timer = useRef(store.getTimer({ ...props, startValue })).current;
@@ -46,6 +48,7 @@ const useTimer = ({
   const { startTick, stopTick, isRunning } = useTick({
     onTick: updateTime,
     tickInterval: intervalLength,
+    onIsRunningChange,
   });
 
   // time in milliseconds

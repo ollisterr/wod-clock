@@ -1,9 +1,27 @@
 import styled, { css } from ".";
-import { Color, Typography } from "./theme";
+import { Color, Spacing, Typography } from "./theme";
 
 export const RoundButton = styled.TouchableOpacity`
   background-color: ${(p) => p.theme.colors.peach};
   border-radius: ${(p) => p.theme.borderRadius.pill};
+`;
+
+export const OutlineButton = styled.TouchableOpacity`
+  padding-vertical: ${(p) => p.theme.spacing.small};
+  padding-horizontal: ${(p) => p.theme.spacing.large};
+  border-radius: ${(p) => p.theme.borderRadius.pill};
+  border: solid 2px ${(p) => p.theme.colors.white};
+  color: ${(p) => p.theme.colors.white};
+  align-items: center;
+  justify-content: center;
+`;
+
+export const EmptyList = styled.View`
+  flex: 1;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: ${(p) => p.theme.spacing.default};
 `;
 
 export const EvenRow = styled.View`
@@ -27,6 +45,11 @@ export const Text = styled.Text<{
     `}
 `;
 
+export const Title = styled(Text).attrs({ typography: "title" })``;
+export const Subtitle = styled(Text).attrs({ typography: "subtitle" })`
+  color: ${(p) => p.theme.colors.lightgrey};
+`;
+
 export const Input = styled.TextInput<{ fill?: boolean; alignRight?: boolean }>`
   ${(p) => p.theme.typography.body}
   border-radius: ${(p) => p.theme.borderRadius.default};
@@ -36,4 +59,12 @@ export const Input = styled.TextInput<{ fill?: boolean; alignRight?: boolean }>`
   color: ${(p) => p.theme.colors.white};
   background-color: rgba(0, 0, 0, 0.2);
   ${(p) => p.alignRight && "text-align: right;"}
+`;
+
+export const Divider = styled.View<{ spacing?: Spacing }>`
+  width: ${(p) => p.theme.spacing.medium};
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.3);
+  margin-vertical: ${(p) => p.theme.spacing[p.spacing ?? "default"]};
+  border-radius: ${(p) => p.theme.borderRadius.pill};
 `;
