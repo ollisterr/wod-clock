@@ -15,6 +15,7 @@ const theme = {
     lightgrey: "#aaa",
     whitesmoke: "#ddd",
     white: "#fff",
+    success: "#4BB543",
   },
   borderRadius: {
     small: px(3),
@@ -45,7 +46,7 @@ const theme = {
     `,
     description: css`
       font-family: "space-mono";
-      font-size: ${px(12)};
+      font-size: ${px(14)};
     `,
     title: css`
       font-family: "space-mono";

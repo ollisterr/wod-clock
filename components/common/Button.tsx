@@ -1,6 +1,13 @@
 import { FontAwesome } from "@expo/vector-icons";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { TouchableNativeFeedbackProps } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 
 import styled from "../../styles";
 import theme, { Spacing } from "../../styles/theme";
@@ -19,9 +26,7 @@ export default function Button({ children, ...rest }: Props) {
 }
 
 const ButtonWrapper = styled.TouchableOpacity`
-  flex: 0;
-  min-height: ${(p) => p.theme.px(20)};
-  min-width: ${(p) => p.theme.px(20)};
+  width: 100%;
   align-items: center;
   justify-content: center;
   flex-direction: row;
@@ -42,16 +47,51 @@ const ButtonText = styled.Text`
 
 interface IconButtonProps extends Props {
   size?: Spacing;
+  success?: boolean;
 }
 
 export function IconButton({
   children,
+  success = false,
   size = "xxlarge",
   ...rest
 }: IconButtonProps) {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const opacity = useSharedValue(0);
+
+  const opacityStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  useEffect(() => {
+    opacity.value = withTiming(success ? 1 : 0, {
+      duration: 300,
+    });
+
+    if (success) {
+      scale.value = withSequence(
+        withTiming(2, { duration: 200, easing: Easing.out(Easing.ease) }),
+        withTiming(1, { duration: 500, easing: Easing.inOut(Easing.ease) })
+      );
+    }
+  }, [success]);
+
   return (
     <IconButtonWrapper {...rest} size={size}>
-      <IconWrapper>{children}</IconWrapper>
+      <SuccessBackground style={opacityStyle} />
+
+      <IconWrapper style={animatedStyle}>
+        {success ? (
+          <FontAwesome name="check" color={theme.colors.white} />
+        ) : (
+          children
+        )}
+      </IconWrapper>
     </IconButtonWrapper>
   );
 }
@@ -69,10 +109,17 @@ const IconButtonWrapper = styled.TouchableOpacity<{
   ${(p) => p.disabled && "opacity: 0.2;"}
 `;
 
-const IconWrapper = styled.View`
+const IconWrapper = styled(Animated.View)`
   position: absolute;
   align-items: center;
   justify-content: center;
+`;
+
+const SuccessBackground = styled(IconWrapper)`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: ${(p) => p.theme.colors.success};
 `;
 
 export const AddButton = ({ size = "large", ...props }: IconButtonProps) => (

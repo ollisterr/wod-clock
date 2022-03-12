@@ -11,17 +11,29 @@ import { SetType } from "./types";
 
 interface Props extends Required<SetType> {
   isActive: boolean;
-  onRemove: () => void;
-  showTools: boolean;
+  isRunning?: boolean;
+  showTools?: boolean;
+  onRemove?: () => void;
 }
 
-export default function Set({ name, onRemove, showTools, ...rest }: Props) {
+export default function Set({
+  name,
+  onRemove,
+  isRunning = true,
+  showTools = false,
+  ...rest
+}: Props) {
   return (
     <View>
-      <Wrapper isActive={rest.isActive}>
-        <SetTitle>{name}</SetTitle>
+      <Wrapper isActive={rest.isActive} isRunning={isRunning}>
+        <SetTitle
+          isRunning={isRunning}
+          color={rest.isActive ? "peach" : undefined}
+        >
+          {name}
+        </SetTitle>
 
-        <SetText>{rest.duration / SECOND} s</SetText>
+        <SetText isRunning={isRunning}>{rest.duration / SECOND} s</SetText>
 
         {showTools && (
           <>
@@ -38,12 +50,12 @@ export default function Set({ name, onRemove, showTools, ...rest }: Props) {
         )}
       </Wrapper>
 
-      <ProgressBar {...rest} />
+      {isRunning && <ProgressBar {...rest} isRunning={isRunning} />}
     </View>
   );
 }
 
-const Wrapper = styled.View<{ isActive?: boolean }>`
+const Wrapper = styled.View<{ isActive?: boolean; isRunning: boolean }>`
   width: 100%;
   padding-horizontal: ${(p) => p.theme.spacing.default};
   padding-vertical: ${(p) => p.theme.spacing.small};
@@ -51,9 +63,19 @@ const Wrapper = styled.View<{ isActive?: boolean }>`
   align-items: center;
   background-color: ${(p) =>
     p.isActive ? "rgba(255, 255, 255, 0.05)" : "transparent"};
+  ${(p) => p.isRunning && !p.isActive && "opacity: 0.5;"}
+  ${(p) => !p.isRunning && "border-bottom-width: 1px;"}
+  ${(p) => !p.isRunning && "border-bottom-color: rgba(150, 150, 150, 0.1);"}
 `;
 
-const SetText = styled(Text)`
+const SetText = styled(Text).attrs<{
+  isRunning: boolean;
+}>(({ isRunning, ...props }) => ({
+  typography: isRunning ? "body" : "description",
+  ...props,
+}))<{
+  isRunning: boolean;
+}>`
   margin-right: ${(p) => p.theme.spacing.default};
 `;
 

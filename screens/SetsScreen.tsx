@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
 
-import { ScreenWrapper, Timer, Set, Spacer } from "../components";
-import ExercisesModalButton from "../components/ExercisesModalButton";
-import { SetType } from "../components/types";
+import { ScreenWrapper, Timer, Set, Spacer, IconButton } from "../components";
+import ExercisesModalButton from "../components/ExercisesModal";
+import { Exercise } from "../components/types";
 import styled from "../styles";
 import {
   Divider,
@@ -12,23 +12,24 @@ import {
   Text,
   Title,
 } from "../styles/styles";
-import { ScrollView } from "react-native-gesture-handler";
-import { useIsKeyboardOpen } from "../contexts/AppStateContext";
+import { ScrollView } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import theme from "../styles/theme";
 
 export default function SetsScreen() {
   const [roundsInput, setRoundsInput] = useState(1);
   const [currentRound, setCurrentRound] = useState(1);
-  const [sets, setSets] = useState<SetType[]>([]);
+  const [exercise, setExercise] = useState<Exercise>();
 
   const [activeSet, setActiveSet] = useState<number>(0);
   const [isRunning, setIsRunning] = useState(false);
 
   const listRef = useRef<ScrollView>(null);
 
-  const isKeyboardOpen = useIsKeyboardOpen();
-
   const onSetEnd = () => {
-    const nextSetIndex = (activeSet + 1) % sets.length;
+    if (!exercise) return { stop: true };
+
+    const nextSetIndex = (activeSet + 1) % exercise.sets.length;
 
     if (nextSetIndex === 0) {
       if (currentRound === 1) {
@@ -44,16 +45,12 @@ export default function SetsScreen() {
     setActiveSet(nextSetIndex);
     listRef.current?.scrollTo({ x: 0, y: activeSet, animated: true });
 
-    return { endTime: sets[nextSetIndex].duration };
-  };
-
-  const removeSet = (set: SetType) => {
-    setSets(sets.filter((x) => x !== set));
+    return { endTime: exercise.sets[nextSetIndex].duration };
   };
 
   const onReset = () => {
-    setActiveSet(0);
     setCurrentRound(roundsInput);
+    setActiveSet(0);
   };
 
   const setRounds = (input: string) => {
@@ -62,14 +59,24 @@ export default function SetsScreen() {
     setRoundsInput(rounds);
   };
 
-  const currentSet = sets[activeSet];
-  const nextSet = sets[(activeSet + 1) % sets.length];
+  const currentSet = exercise?.sets[activeSet];
+  const nextSet = exercise?.sets[(activeSet + 1) % exercise.sets.length];
 
   return (
     <ScreenWrapper noPadding>
-      {!isKeyboardOpen && !isRunning && <Spacer fill />}
+      {!isRunning ? (
+        <>
+          <EvenRow>
+            <Spacer axis="x" />
 
-      {isRunning && (
+            <ExercisesModalButton onSelect={setExercise}>
+              <FontAwesome name="list" size={24} color={theme.colors.white} />
+            </ExercisesModalButton>
+          </EvenRow>
+
+          <Spacer spacing="xlarge" />
+        </>
+      ) : (
         <Header>
           <Subtitle typography="subtitle">Round {currentRound}</Subtitle>
           <Title>{currentSet?.name}</Title>
@@ -80,58 +87,59 @@ export default function SetsScreen() {
         </Header>
       )}
 
-      {!isKeyboardOpen && (
-        <TimerWrapper>
-          <Timer
-            name="sets"
-            editable={false}
-            showCentseconds
-            rounds={currentRound}
-            startTime={sets[activeSet]?.duration ?? 0}
-            onTimeEnd={onSetEnd}
-            onIsRunningChange={setIsRunning}
-            onReset={onReset}
-          />
-        </TimerWrapper>
+      <TimerWrapper>
+        <Timer
+          name="sets"
+          editable={false}
+          showCentseconds
+          rounds={currentRound}
+          startTime={currentSet?.duration ?? 0}
+          onTimeEnd={onSetEnd}
+          onIsRunningChange={setIsRunning}
+          onReset={onReset}
+        />
+      </TimerWrapper>
+
+      {exercise && !isRunning && (
+        <SetRow>
+          <EvenRow>
+            <Text>{exercise.name}</Text>
+
+            <BottomBarWrapper>
+              <Text color="lightgrey">Rounds</Text>
+
+              <Spacer axis="x" />
+
+              <Input
+                value={roundsInput.toString()}
+                onChangeText={setRounds}
+                keyboardType="number-pad"
+                alignRight
+              />
+            </BottomBarWrapper>
+          </EvenRow>
+        </SetRow>
       )}
-
-      <SetRow>
-        <EvenRow>
-          <Subtitle>Custom rounds</Subtitle>
-
-          <BottomBarWrapper>
-            <Text>Rounds</Text>
-
-            <Spacer axis="x" />
-
-            <Input
-              value={roundsInput.toString()}
-              onChangeText={setRounds}
-              keyboardType="number-pad"
-              alignRight
-            />
-          </BottomBarWrapper>
-        </EvenRow>
-      </SetRow>
 
       <SetsWrapper
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom: 32,
+        }}
         ref={listRef}
       >
-        {sets.length > 0 ? (
-          sets.map((set, i) => (
+        {exercise && exercise.sets.length > 0 ? (
+          exercise.sets.map((set, i) => (
             <Set
               key={set.name}
               isActive={isRunning && activeSet === i}
-              onRemove={() => removeSet(set)}
-              showTools={!isRunning}
               {...set}
             />
           ))
         ) : (
           <EmptySetsWrapper>
-            <ExercisesModalButton onSelect={({ sets }) => setSets(sets)}>
+            <ExercisesModalButton onSelect={setExercise}>
               <Subtitle>Tap to add sets</Subtitle>
             </ExercisesModalButton>
           </EmptySetsWrapper>
@@ -143,7 +151,7 @@ export default function SetsScreen() {
 
 const Header = styled.View`
   align-items: center;
-  padding-vertical: ${(p) => p.theme.spacing.default};
+  padding-top: ${(p) => p.theme.spacing.large};
 `;
 
 const EmptySetsWrapper = styled.View`
@@ -166,7 +174,6 @@ const SetRow = styled.View`
 const SetsWrapper = styled.ScrollView`
   flex: 2;
   width: 100%;
-  padding-top: ${(p) => p.theme.spacing.default};
 `;
 
 const BottomBarWrapper = styled.View`

@@ -1,5 +1,5 @@
 import styled, { css } from ".";
-import { Color, Spacing, Typography } from "./theme";
+import theme, { Color, Spacing, Typography } from "./theme";
 
 export const RoundButton = styled.TouchableOpacity`
   background-color: ${(p) => p.theme.colors.peach};
@@ -46,12 +46,16 @@ export const Text = styled.Text<{
 `;
 
 export const Title = styled(Text).attrs({ typography: "title" })``;
-export const Subtitle = styled(Text).attrs({ typography: "subtitle" })`
-  color: ${(p) => p.theme.colors.lightgrey};
-`;
+export const Subtitle = styled(Text).attrs((props) => ({
+  typography: "subtitle",
+  color: "lightgrey",
+  ...props,
+}))``;
 
-export const Input = styled.TextInput<{ fill?: boolean; alignRight?: boolean }>`
-  ${(p) => p.theme.typography.body}
+export const Input = styled.TextInput.attrs({
+  placeholderTextColor: theme.colors.grey,
+})<{ fill?: boolean; alignRight?: boolean }>`
+  ${(p) => p.theme.typography.description}
   border-radius: ${(p) => p.theme.borderRadius.default};
   padding: ${(p) => p.theme.spacing.small} ${(p) => p.theme.spacing.default};
   flex: ${(p) => (p.fill ? 1 : 0)} 1 20%;

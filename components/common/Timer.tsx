@@ -104,6 +104,11 @@ const Timer = forwardRef(
       reset();
     };
 
+    const onStopPress = () => {
+      onReset?.();
+      stop();
+    };
+
     const onStartPress = () =>
       countdownEnabled && time === resetValue ? setShouldStart(true) : start();
 
@@ -169,7 +174,7 @@ const Timer = forwardRef(
         )}
 
         <EvenRow>
-          <IconButton onPress={() => stop()} disabled={!isRunning}>
+          <IconButton onPress={onStopPress} disabled={!isRunning}>
             <FontAwesome name="square" size={20} color={theme.colors.white} />
           </IconButton>
 
