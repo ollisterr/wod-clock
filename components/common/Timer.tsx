@@ -126,7 +126,6 @@ const Timer = forwardRef(
       <Wrapper>
         <Countdown
           running={shouldStart && countdownEnabled && time === resetValue}
-          length={countdownLength}
           onFinish={() => {
             setShouldStart(false);
             start();

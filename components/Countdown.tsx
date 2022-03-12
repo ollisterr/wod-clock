@@ -6,12 +6,14 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+
+import { Text } from "../styles/styles";
 import { SECOND } from "../constants/time";
 import { useSettings } from "../contexts/SettingsContext";
-
 import useTimer from "../hooks/useTimer";
 import styled from "../styles";
 import { timeBreakdown } from "../utils/time.utils";
+import { Spacer } from "./common";
 
 interface Props {
   running: boolean;
@@ -68,16 +70,14 @@ export default function Countdown({ running, onCancel, onFinish }: Props) {
       <Backdrop onPress={cancel} activeOpacity={1}>
         {/* increment by 1 to not show zero value */}
         <CountdownText style={animatedStyles}>{seconds + 1}</CountdownText>
+
+        <Spacer />
+
+        <InfoText>Tap to cancel countdown</InfoText>
       </Backdrop>
     </Modal>
   );
 }
-
-const CountdownText = styled(Animated.Text)`
-  ${(p) => p.theme.typography.timer}
-  font-size: ${(p) => p.theme.px(120)};
-  color: ${(p) => p.theme.colors.white};
-`;
 
 const Backdrop = styled.TouchableOpacity`
   height: 100%;
@@ -85,4 +85,15 @@ const Backdrop = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.4);
+`;
+
+const CountdownText = styled(Animated.Text)`
+  ${(p) => p.theme.typography.timer}
+  font-size: ${(p) => p.theme.px(120)};
+  color: ${(p) => p.theme.colors.white};
+`;
+
+const InfoText = styled(Text)`
+  font-size: ${(p) => p.theme.px(16)};
+  color: ${(p) => p.theme.colors.grey};
 `;
