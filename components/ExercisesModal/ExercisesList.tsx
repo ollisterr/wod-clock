@@ -9,6 +9,7 @@ import { ExcerciseData, Exercise } from "../types";
 import { HeaderRow, Row, SetsWrapper } from "./common";
 import theme from "../../styles/theme";
 import styled from "../../styles";
+import { formatTimeStamp } from "../../utils/time.utils";
 
 interface Props {
   exercises: ExcerciseData;
@@ -47,7 +48,7 @@ export default function ExercisesList({
                 <Subtitle color="white">{exercise.name} </Subtitle>
 
                 <Subtitle>
-                  – {new Date(exercise.timestamp).toLocaleTimeString()}
+                  – {formatTimeStamp(new Date(exercise.timestamp))}
                 </Subtitle>
 
                 <Spacer axis="x" fill />

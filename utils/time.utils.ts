@@ -19,3 +19,11 @@ export const timeComponentsToMilliseconds = ({
   milliseconds,
 }: TimeComponents) =>
   hours * HOUR + minutes * MINUTE + seconds * SECOND + milliseconds;
+
+const dayMap = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+export const formatTimeStamp = (time: Date) => {
+  return `${dayMap[time.getDay()]} ${leadingZeros(
+    time.getDate()
+  )}/${leadingZeros(time.getMonth() + 1)}`;
+};
