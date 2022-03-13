@@ -94,7 +94,7 @@ export default function ExerciseDetails({
             key={set.name}
             isActive={false}
             onRemove={() => onRemoveSet(set)}
-            isRunning={false}
+            compact
             showTools
             {...set}
           />
@@ -128,7 +128,14 @@ export default function ExerciseDetails({
 
         <Spacer />
 
-        <Button onPress={() => onConfirm(exercise)}>Start exercise</Button>
+        <Button
+          onPress={() => {
+            onConfirm(exercise);
+            onClose();
+          }}
+        >
+          Start exercise
+        </Button>
       </BottomRow>
     </>
   );

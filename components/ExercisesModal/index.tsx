@@ -10,13 +10,25 @@ import { ExcerciseData, Exercise } from "../types";
 interface Props {
   children: ReactNode;
   onSelect: (set?: Exercise) => void;
+  exercise?: Exercise;
+  noPadding?: boolean;
 }
 
-export default function ExercisesModalButton({ children, onSelect }: Props) {
+export default function ExercisesModalButton({
+  children,
+  onSelect,
+  exercise,
+  noPadding,
+}: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [exercises, setExercises] = useState<ExcerciseData>({});
   const [showExerciseDetails, toggleShowExerciseDetails] = useState(false);
-  const [activeExercise, setActiveExercise] = useState<Exercise>();
+
+  useEffect(() => {
+    if (isModalOpen && exercise) {
+      toggleShowExerciseDetails(true);
+    }
+  }, [isModalOpen]);
 
   useEffect(() => {
     getExercises().then((data) => !!data && setExercises(data));
@@ -39,7 +51,9 @@ export default function ExercisesModalButton({ children, onSelect }: Props) {
 
   return (
     <>
-      <ModalButton onPress={() => setIsModalOpen(true)}>{children}</ModalButton>
+      <ModalButton onPress={() => setIsModalOpen(true)} noPadding={noPadding}>
+        {children}
+      </ModalButton>
 
       <Modal
         isOpen={isModalOpen}
@@ -51,7 +65,7 @@ export default function ExercisesModalButton({ children, onSelect }: Props) {
       >
         {showExerciseDetails ? (
           <ExerciseDetails
-            exercise={activeExercise}
+            exercise={exercise}
             onSave={saveExercise}
             onConfirm={selectExercise}
             onClose={() => toggleShowExerciseDetails(false)}
@@ -62,10 +76,9 @@ export default function ExercisesModalButton({ children, onSelect }: Props) {
             onAddButtonPress={() => toggleShowExerciseDetails(true)}
             onExerciseSelect={selectExercise}
             onExerciseEdit={(exercise) => {
-              setActiveExercise(exercise);
+              onSelect(exercise);
               toggleShowExerciseDetails(true);
             }}
-            onClose={() => selectExercise(activeExercise)}
           />
         )}
       </Modal>
@@ -73,7 +86,10 @@ export default function ExercisesModalButton({ children, onSelect }: Props) {
   );
 }
 
-const ModalButton = styled.TouchableOpacity`
-  padding-horizontal: ${(p) => p.theme.spacing.large};
-  padding-vertical: ${(p) => p.theme.spacing.medium};
+const ModalButton = styled.TouchableOpacity<{ noPadding?: boolean }>`
+  flex-direction: row;
+  align-items: center;
+  ${(p) => !p.noPadding && `padding-horizontal: ${p.theme.spacing.large};`}
+  ${(p) => !p.noPadding && `padding-vertical: ${p.theme.spacing.medium};`}
+  color: ${(p) => p.theme.colors.white};
 `;

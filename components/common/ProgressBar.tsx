@@ -11,10 +11,14 @@ import styled from "../../styles";
 interface Props {
   duration: number;
   isActive: boolean;
-  isRunning: boolean;
+  isRunning?: boolean;
 }
 
-export default function ProgressBar({ duration, isActive, isRunning }: Props) {
+export default function ProgressBar({
+  duration,
+  isActive,
+  isRunning = false,
+}: Props) {
   const currentProgress = useSharedValue(0);
 
   const animatedStyles = useAnimatedStyle(() => ({

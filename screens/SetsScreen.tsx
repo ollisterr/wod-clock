@@ -1,6 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import { ScreenWrapper, Timer, Set, Spacer, IconButton } from "../components";
+import { ScreenWrapper, Timer, Set, Spacer } from "../components";
 import ExercisesModalButton from "../components/ExercisesModal";
 import { Exercise } from "../components/types";
 import styled from "../styles";
@@ -23,8 +23,14 @@ export default function SetsScreen() {
 
   const [activeSet, setActiveSet] = useState<number>(0);
   const [isRunning, setIsRunning] = useState(false);
+  const [isInActionView, setIsInActionView] = useState(false);
 
   const listRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    // reset active set on exercise change
+    setActiveSet(0);
+  }, [exercise]);
 
   const onSetEnd = () => {
     if (!exercise) return { stop: true };
@@ -49,6 +55,7 @@ export default function SetsScreen() {
   };
 
   const onReset = () => {
+    setIsInActionView(false);
     setCurrentRound(roundsInput);
     setActiveSet(0);
   };
@@ -64,7 +71,7 @@ export default function SetsScreen() {
 
   return (
     <ScreenWrapper noPadding>
-      {!isRunning ? (
+      {!isInActionView ? (
         <>
           <EvenRow>
             <Spacer axis="x" />
@@ -78,12 +85,15 @@ export default function SetsScreen() {
         </>
       ) : (
         <Header>
-          <Subtitle typography="subtitle">Round {currentRound}</Subtitle>
+          <Subtitle typography="subtitle">
+            Round {roundsInput - currentRound + 1} / {roundsInput}
+          </Subtitle>
+
           <Title>{currentSet?.name}</Title>
 
           <Divider spacing="small" />
 
-          <Subtitle typography="subtitle">Next round: {nextSet?.name}</Subtitle>
+          <Subtitle typography="subtitle">Next: {nextSet?.name}</Subtitle>
         </Header>
       )}
 
@@ -95,15 +105,27 @@ export default function SetsScreen() {
           rounds={currentRound}
           startTime={currentSet?.duration ?? 0}
           onTimeEnd={onSetEnd}
+          onStart={() => setIsInActionView(true)}
+          onStop={() => setIsInActionView(false)}
           onIsRunningChange={setIsRunning}
           onReset={onReset}
         />
       </TimerWrapper>
 
-      {exercise && !isRunning && (
+      {exercise && !isInActionView && (
         <SetRow>
           <EvenRow>
-            <Text>{exercise.name}</Text>
+            <ExercisesModalButton
+              exercise={exercise}
+              onSelect={setExercise}
+              noPadding
+            >
+              <Text>{exercise.name}</Text>
+
+              <Spacer axis="x" />
+
+              <FontAwesome name="pencil" size={16} color={theme.colors.grey} />
+            </ExercisesModalButton>
 
             <BottomBarWrapper>
               <Text color="lightgrey">Rounds</Text>
@@ -133,7 +155,9 @@ export default function SetsScreen() {
           exercise.sets.map((set, i) => (
             <Set
               key={set.name}
-              isActive={isRunning && activeSet === i}
+              isActive={isInActionView && activeSet === i}
+              isRunning={isRunning}
+              isInActionView={isInActionView}
               {...set}
             />
           ))

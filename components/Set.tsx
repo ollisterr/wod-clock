@@ -12,28 +12,28 @@ import { SetType } from "./types";
 interface Props extends Required<SetType> {
   isActive: boolean;
   isRunning?: boolean;
+  isInActionView?: boolean;
   showTools?: boolean;
+  compact?: boolean;
   onRemove?: () => void;
 }
 
 export default function Set({
   name,
   onRemove,
-  isRunning = true,
   showTools = false,
+  isInActionView = false,
+  compact = false,
   ...rest
 }: Props) {
   return (
     <View>
-      <Wrapper isActive={rest.isActive} isRunning={isRunning}>
-        <SetTitle
-          isRunning={isRunning}
-          color={rest.isActive ? "peach" : undefined}
-        >
+      <Wrapper isActive={rest.isActive} isInActionView={isInActionView}>
+        <SetTitle compact={compact} color={rest.isActive ? "peach" : undefined}>
           {name}
         </SetTitle>
 
-        <SetText isRunning={isRunning}>{rest.duration / SECOND} s</SetText>
+        <SetText compact={compact}>{rest.duration / SECOND} s</SetText>
 
         {showTools && (
           <>
@@ -50,12 +50,12 @@ export default function Set({
         )}
       </Wrapper>
 
-      {isRunning && <ProgressBar {...rest} isRunning={isRunning} />}
+      {isInActionView && <ProgressBar {...rest} />}
     </View>
   );
 }
 
-const Wrapper = styled.View<{ isActive?: boolean; isRunning: boolean }>`
+const Wrapper = styled.View<{ isActive?: boolean; isInActionView: boolean }>`
   width: 100%;
   padding-horizontal: ${(p) => p.theme.spacing.default};
   padding-vertical: ${(p) => p.theme.spacing.small};
@@ -63,18 +63,19 @@ const Wrapper = styled.View<{ isActive?: boolean; isRunning: boolean }>`
   align-items: center;
   background-color: ${(p) =>
     p.isActive ? "rgba(255, 255, 255, 0.05)" : "transparent"};
-  ${(p) => p.isRunning && !p.isActive && "opacity: 0.5;"}
-  ${(p) => !p.isRunning && "border-bottom-width: 1px;"}
-  ${(p) => !p.isRunning && "border-bottom-color: rgba(150, 150, 150, 0.1);"}
+  ${(p) => p.isInActionView && !p.isActive && "opacity: 0.5;"}
+  ${(p) => !p.isInActionView && "border-bottom-width: 1px;"}
+  ${(p) =>
+    !p.isInActionView && "border-bottom-color: rgba(150, 150, 150, 0.1);"}
 `;
 
 const SetText = styled(Text).attrs<{
-  isRunning: boolean;
-}>(({ isRunning, ...props }) => ({
-  typography: isRunning ? "body" : "description",
+  compact: boolean;
+}>(({ compact, ...props }) => ({
+  typography: compact ? "description" : "body",
   ...props,
 }))<{
-  isRunning: boolean;
+  compact: boolean;
 }>`
   margin-right: ${(p) => p.theme.spacing.default};
 `;

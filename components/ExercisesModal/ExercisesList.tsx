@@ -16,7 +16,6 @@ interface Props {
   onAddButtonPress: () => void;
   onExerciseSelect: (exercise: Exercise) => void;
   onExerciseEdit: (exercise: Exercise) => void;
-  onClose: () => void;
 }
 
 export default function ExercisesList({
