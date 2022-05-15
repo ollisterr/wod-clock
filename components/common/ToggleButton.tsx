@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Easing } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { Animated, Easing, TouchableOpacity } from "react-native";
+
 import styled from "../../styles";
 import theme from "../../styles/theme";
 

@@ -24,7 +24,7 @@ export default function AppStateProvider({ children }: Props) {
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
   useEffect(() => {
-    AppState.addEventListener("change", setAppState);
+    const appStateListener = AppState.addEventListener("change", setAppState);
 
     const willShowSubscription = Keyboard.addListener(
       "keyboardWillShow",
@@ -47,7 +47,7 @@ export default function AppStateProvider({ children }: Props) {
     });
 
     return () => {
-      AppState.removeEventListener("change", setAppState);
+      appStateListener.remove();
 
       willShowSubscription.remove();
       showSubscription.remove();

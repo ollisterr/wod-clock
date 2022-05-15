@@ -14,6 +14,7 @@ export default function SettingRow({ title, value, onToggle }: Props) {
   return (
     <Wrapper>
       <Text>{title}</Text>
+
       <ToggleButton value={value} onChange={onToggle} />
     </Wrapper>
   );
