@@ -35,7 +35,7 @@ export default function ToggleButton({ value, onChange }: Props) {
 
   const backgroundColor = color.interpolate({
     inputRange: [0, 1],
-    outputRange: [theme.colors.lightgrey, theme.colors.peach],
+    outputRange: [theme.colors.lightgrey, theme.colors.primary],
   });
 
   const translateX = position.interpolate({

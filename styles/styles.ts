@@ -2,7 +2,7 @@ import styled, { css } from ".";
 import theme, { Color, Spacing, Typography } from "./theme";
 
 export const RoundButton = styled.TouchableOpacity`
-  background-color: ${(p) => p.theme.colors.peach};
+  background-color: ${(p) => p.theme.colors.primary};
   border-radius: ${(p) => p.theme.borderRadius.pill};
 `;
 

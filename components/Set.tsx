@@ -29,7 +29,10 @@ export default function Set({
   return (
     <View>
       <Wrapper isActive={rest.isActive} isInActionView={isInActionView}>
-        <SetTitle compact={compact} color={rest.isActive ? "peach" : undefined}>
+        <SetTitle
+          compact={compact}
+          color={rest.isActive ? "primary" : undefined}
+        >
           {name}
         </SetTitle>
 

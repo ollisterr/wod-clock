@@ -5,9 +5,8 @@ const theme = {
   px,
   colors: {
     // accents
-    peach: "#ff6f3b",
-    peachMuted: "#cc6039",
-    peachGrey: "#d1b4ab",
+    primary: "#EF4136",
+    primaryMuted: "#BF4643",
 
     // greys
     black: "#222",

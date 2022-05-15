@@ -23,11 +23,9 @@ export default function ExercisesModal({
       transparent
       onRequestClose={onClose}
     >
-      <Backdrop onPress={onClose} activeOpacity={1} />
-
-      <PaddingWrapper>
+      <Backdrop onPress={onClose} activeOpacity={1}>
         <ContentWrapper noPadding={noPadding}>{children}</ContentWrapper>
-      </PaddingWrapper>
+      </Backdrop>
     </ModalWrapper>
   );
 }
@@ -42,6 +40,7 @@ const Backdrop = styled.TouchableOpacity`
   height: 100%;
   width: 100%;
   padding: ${(p) => p.theme.spacing.default};
+  align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.5);
 `;
@@ -57,12 +56,4 @@ const ContentWrapper = styled.View.attrs({
   background-color: ${(p) => p.theme.colors.black};
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
   elevation: 10;
-`;
-
-const PaddingWrapper = styled.View`
-  flex: 1;
-  width: 100%;
-  padding: ${(p) => p.theme.spacing.default};
-  align-items: center;
-  justify-content: center;
 `;

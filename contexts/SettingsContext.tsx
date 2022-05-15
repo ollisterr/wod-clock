@@ -12,6 +12,7 @@ interface Settings {
   audioEnabled: boolean;
   vibrationEnabled: boolean;
   countdownLength: number;
+  cueLength: number;
 }
 
 interface SettingsContext extends Settings {
@@ -19,6 +20,7 @@ interface SettingsContext extends Settings {
   setCountdownLength: (x: number) => void;
   toggleAudioEnabled: () => void;
   toggleVibrationEnabled: () => void;
+  setCueLength: (x: number) => void;
 }
 
 interface Props {
@@ -43,12 +45,24 @@ export default function SettingsProvider({ children }: Props) {
     audioEnabled: true,
     vibrationEnabled: true,
     countdownLength: 5,
+    cueLength: 3,
   });
 
   useEffect(() => {
     AsyncStorage.getItem(SETTINGS_STORAGE_KEY).then((storedSettings) => {
       if (!storedSettings) return;
-      setSettings(JSON.parse(storedSettings));
+
+      const loadedSettings = Object.entries(JSON.parse(storedSettings)).reduce(
+        (acc, [key, value]) =>
+          value
+            ? {
+                ...acc,
+                [key]: value,
+              }
+            : acc,
+        settings
+      );
+      setSettings(loadedSettings);
     });
   }, []);
 
@@ -69,6 +83,7 @@ export default function SettingsProvider({ children }: Props) {
     updateSettings("audioEnabled", !settings.audioEnabled);
   const toggleVibrationEnabled = () =>
     updateSettings("vibrationEnabled", !settings.vibrationEnabled);
+  const setCueLength = (x: number) => updateSettings("cueLength", x);
 
   return (
     <SettingsContext.Provider
@@ -78,6 +93,7 @@ export default function SettingsProvider({ children }: Props) {
         setCountdownLength,
         toggleAudioEnabled,
         toggleVibrationEnabled,
+        setCueLength,
       }}
     >
       {children}

@@ -34,7 +34,7 @@ const ButtonWrapper = styled.TouchableOpacity`
   padding-horizontal: ${(p) => p.theme.spacing.small};
   border: none;
   border-radius: ${(p) => p.theme.borderRadius.pill};
-  background-color: ${(p) => p.theme.colors.peachMuted};
+  background-color: ${(p) => p.theme.colors.primaryMuted};
 `;
 
 const ButtonText = styled.Text`

@@ -57,7 +57,7 @@ const Wrapper = styled.View`
 
 const typographyStyle = css<{ color?: Color }>`
   ${(p) => p.theme.typography.timer}
-  color: ${(p) => p.theme.colors[p.color ?? "peach"]};
+  color: ${(p) => p.theme.colors[p.color ?? "primary"]};
   text-align: center;
 `;
 

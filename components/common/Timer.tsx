@@ -24,6 +24,7 @@ import {
 } from "../../utils/time.utils";
 import Countdown from "../Countdown";
 import { range } from "../../utils/utils";
+import { useSound } from "../../contexts/SoundContext";
 
 interface Props extends TimerProps {
   startTime?: number;
@@ -50,7 +51,9 @@ const Timer = forwardRef(
     }: Props,
     ref
   ) => {
-    const { vibrationEnabled, countdownEnabled } = useSettings();
+    const { vibrationEnabled, countdownEnabled, audioEnabled, cueLength } =
+      useSettings();
+    const { shortCue, longCue } = useSound();
 
     const [shouldStart, setShouldStart] = useState(false);
     const [timeComponents, setTimeComponents] = useState<TimeComponents>({
@@ -83,17 +86,30 @@ const Timer = forwardRef(
       const components = timeBreakdown(time);
 
       if (
-        vibrationEnabled &&
         isRunning &&
         countdown &&
-        range(5).includes(components.seconds) &&
+        range(cueLength + 1).includes(components.seconds) &&
         components.minutes === 0 &&
         components.hours === 0
       ) {
         // vibrate longer on the last second
-        Vibration.vibrate(components.seconds === 0 ? 1500 : undefined);
+        if (vibrationEnabled) {
+          Vibration.vibrate(components.seconds === 0 ? 1500 : undefined);
+        }
+        if (audioEnabled) {
+          components.seconds === 0 ? longCue() : shortCue();
+        }
       }
-    }, [timeBreakdown(time).seconds, isRunning, vibrationEnabled]);
+
+      if (
+        isRunning &&
+        audioEnabled &&
+        countdownEnabled &&
+        time === resetValue
+      ) {
+        longCue();
+      }
+    }, [timeBreakdown(time).seconds, isRunning, vibrationEnabled, cueLength]);
 
     useImperativeHandle(ref, () => ({
       setTime: reset,
@@ -221,7 +237,7 @@ const TimerWrapper = styled.View`
 
 const TimerText = styled.Text<{ color?: Color }>`
   ${(p) => p.theme.typography.timer}
-  color: ${(p) => p.theme.colors[p.color ?? "peach"]};
+  color: ${(p) => p.theme.colors[p.color ?? "primary"]};
   line-height: ${(p) => p.theme.px(78)};
 `;
 

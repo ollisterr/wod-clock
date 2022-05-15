@@ -13,6 +13,7 @@ import SettingsProvider from "./contexts/SettingsContext";
 import AppStateProvider from "./contexts/AppStateContext";
 import TimerProvider from "./contexts/TimerContext";
 import { store } from "./modules/store";
+import { SoundProvider } from "./contexts/SoundContext";
 
 function App() {
   const isLoadingComplete = useCachedResources();
@@ -30,11 +31,13 @@ function App() {
         <SafeAreaProvider>
           <AppStateProvider>
             <SettingsProvider>
-              <TimerProvider>
-                <Navigation colorScheme={colorScheme} />
+              <SoundProvider>
+                <TimerProvider>
+                  <Navigation colorScheme={colorScheme} />
 
-                <StatusBar style="light" />
-              </TimerProvider>
+                  <StatusBar style="light" />
+                </TimerProvider>
+              </SoundProvider>
             </SettingsProvider>
           </AppStateProvider>
         </SafeAreaProvider>

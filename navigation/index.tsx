@@ -61,7 +61,7 @@ function BottomTabNavigator() {
   return (
     <BottomTab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.peach,
+        tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveBackgroundColor: theme.colors.black,
         tabBarActiveBackgroundColor: theme.colors.black,
         headerShown: false,

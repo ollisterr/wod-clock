@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal } from "react-native";
 import Animated, {
   Easing,
@@ -6,6 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { Audio } from "expo-av";
 
 import { Text } from "../styles/styles";
 import { SECOND } from "../constants/time";
@@ -14,6 +15,7 @@ import useTimer from "../hooks/useTimer";
 import styled from "../styles";
 import { timeBreakdown } from "../utils/time.utils";
 import Spacer from "./common/Spacer";
+import { useSound } from "../contexts/SoundContext";
 
 interface Props {
   running: boolean;
@@ -23,6 +25,7 @@ interface Props {
 
 export default function Countdown({ running, onCancel, onFinish }: Props) {
   const { countdownLength } = useSettings();
+  const { shortCue, longCue } = useSound();
 
   const { start, time, stop } = useTimer({
     name: "countdown",
@@ -48,11 +51,13 @@ export default function Countdown({ running, onCancel, onFinish }: Props) {
   }, [seconds]);
 
   useEffect(() => {
-    if (running) {
-      start();
-    } else {
-      stop();
-    }
+    if (seconds > 4) return;
+
+    shortCue();
+  }, [seconds, shortCue, longCue]);
+
+  useEffect(() => {
+    running ? start() : stop();
   }, [running]);
 
   return (
