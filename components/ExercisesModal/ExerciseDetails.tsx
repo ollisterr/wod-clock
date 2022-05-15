@@ -1,5 +1,5 @@
 import { FontAwesome } from "@expo/vector-icons";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ScrollView } from "react-native";
 import { SECOND } from "../../constants/time";
 
@@ -25,13 +25,18 @@ export default function ExerciseDetails({
   onSave,
   onClose,
 }: Props) {
-  const [exercise, setExercise] = useState({
+  const [exercise, setExercise] = useState<Exercise>({
     name: "",
     sets: [],
-    ...origExercise,
-    // update timestamp on edits
     timestamp: Date.now(),
+    ...origExercise,
   });
+
+  useEffect(() => {
+    if (!origExercise) return;
+
+    setExercise((prevState) => ({ ...prevState, ...origExercise }));
+  }, [origExercise]);
 
   const [name, setName] = useState("");
   const [duration, setDuration] = useState(60);
@@ -54,13 +59,13 @@ export default function ExerciseDetails({
 
   const onAddPress = () => {
     addSet({ name, duration: duration * SECOND });
-    setDuration(60);
+    setDuration(duration); // use the latest value as default
     setName("");
     listRef.current?.scrollToEnd({ animated: true });
   };
 
   const onSavePress = () => {
-    onSave(exercise).then(setSaveSuccess);
+    onSave({ ...exercise, timestamp: Date.now() }).then(setSaveSuccess);
   };
 
   return (
@@ -89,9 +94,9 @@ export default function ExerciseDetails({
         ref={listRef}
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        {exercise.sets.map((set) => (
+        {exercise.sets.map((set, i) => (
           <Set
-            key={set.name}
+            key={`${set.name}-${i}`}
             isActive={false}
             onRemove={() => onRemoveSet(set)}
             compact

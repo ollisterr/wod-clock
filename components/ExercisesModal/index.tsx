@@ -20,15 +20,18 @@ export default function ExercisesModalButton({
   exercise,
   noPadding,
 }: Props) {
+  const [selectedExercise, setSelectedExercise] = useState<
+    Exercise | undefined
+  >(exercise);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [exercises, setExercises] = useState<ExcerciseData>({});
   const [showExerciseDetails, toggleShowExerciseDetails] = useState(false);
 
   useEffect(() => {
-    if (isModalOpen && exercise) {
-      toggleShowExerciseDetails(true);
-    }
-  }, [isModalOpen]);
+    setSelectedExercise(exercise);
+
+    if (isModalOpen) toggleShowExerciseDetails(true);
+  }, [exercise, isModalOpen]);
 
   useEffect(() => {
     getExercises().then((data) => !!data && setExercises(data));
@@ -63,12 +66,12 @@ export default function ExercisesModalButton({
         }}
         noPadding
       >
-        {showExerciseDetails ? (
+        {selectedExercise && showExerciseDetails ? (
           <ExerciseDetails
-            exercise={exercise}
+            exercise={selectedExercise}
             onSave={saveExercise}
             onConfirm={selectExercise}
-            onClose={() => toggleShowExerciseDetails(false)}
+            onClose={() => setSelectedExercise(undefined)}
           />
         ) : (
           <ExercisesList
@@ -76,7 +79,7 @@ export default function ExercisesModalButton({
             onAddButtonPress={() => toggleShowExerciseDetails(true)}
             onExerciseSelect={selectExercise}
             onExerciseEdit={(exercise) => {
-              onSelect(exercise);
+              setSelectedExercise(exercise);
               toggleShowExerciseDetails(true);
             }}
           />

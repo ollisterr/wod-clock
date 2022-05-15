@@ -117,8 +117,10 @@ const IconWrapper = styled(Animated.View)`
 
 const SuccessBackground = styled(IconWrapper)`
   position: absolute;
-  width: 100%;
-  height: 100%;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
   background-color: ${(p) => p.theme.colors.success};
 `;
 

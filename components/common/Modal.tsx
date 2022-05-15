@@ -45,7 +45,7 @@ const Backdrop = styled.TouchableOpacity`
   background-color: rgba(0, 0, 0, 0.5);
 `;
 
-const ContentWrapper = styled.View.attrs({
+const ContentWrapper = styled.TouchableOpacity.attrs({
   activeOpacity: 1,
 })<{ noPadding: boolean }>`
   width: 100%;

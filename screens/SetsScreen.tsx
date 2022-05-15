@@ -154,7 +154,7 @@ export default function SetsScreen() {
         {exercise && exercise.sets.length > 0 ? (
           exercise.sets.map((set, i) => (
             <Set
-              key={set.name}
+              key={`${set.name}-${i}`}
               isActive={isInActionView && activeSet === i}
               isRunning={isRunning}
               isInActionView={isInActionView}
