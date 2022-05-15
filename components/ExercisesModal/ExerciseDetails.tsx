@@ -91,7 +91,7 @@ export default function ExerciseDetails({
 
       <SetsWrapper
         keyboardShouldPersistTaps="handled"
-        ref={listRef}
+        ref={listRef as any}
         contentContainerStyle={{ flexGrow: 1 }}
       >
         {exercise.sets.map((set, i) => (
