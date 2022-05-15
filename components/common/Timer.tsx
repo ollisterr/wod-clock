@@ -6,7 +6,6 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Vibration } from "react-native";
 import { observer } from "mobx-react-lite";
 
 import TimeInput from "./TimeInput";
@@ -23,8 +22,7 @@ import {
   timeComponentsToMilliseconds,
 } from "../../utils/time.utils";
 import Countdown from "../Countdown";
-import { range } from "../../utils/utils";
-import { useSound } from "../../contexts/SoundContext";
+import { useCues } from "../../hooks/useCues";
 
 interface Props extends TimerProps {
   startTime?: number;
@@ -51,9 +49,7 @@ const Timer = forwardRef(
     }: Props,
     ref
   ) => {
-    const { vibrationEnabled, countdownEnabled, audioEnabled, cueLength } =
-      useSettings();
-    const { shortCue, longCue } = useSound();
+    const { countdownEnabled } = useSettings();
 
     const [shouldStart, setShouldStart] = useState(false);
     const [timeComponents, setTimeComponents] = useState<TimeComponents>({
@@ -77,39 +73,17 @@ const Timer = forwardRef(
       ...props,
     });
 
+    useCues({
+      ...timeBreakdown(time),
+      isRunning,
+      countdown,
+      timerStarted: time === resetValue,
+    });
+
     useEffect(() => {
       setTimeComponents(timeBreakdown(startTime));
       setResetValue(props.resetValue ?? startTime);
     }, [startTime, props.resetValue]);
-
-    useEffect(() => {
-      const components = timeBreakdown(time);
-
-      if (
-        isRunning &&
-        countdown &&
-        range(cueLength + 1).includes(components.seconds) &&
-        components.minutes === 0 &&
-        components.hours === 0
-      ) {
-        // vibrate longer on the last second
-        if (vibrationEnabled) {
-          Vibration.vibrate(components.seconds === 0 ? 1500 : undefined);
-        }
-        if (audioEnabled) {
-          components.seconds === 0 ? longCue() : shortCue();
-        }
-      }
-
-      if (
-        isRunning &&
-        audioEnabled &&
-        countdownEnabled &&
-        time === resetValue
-      ) {
-        longCue();
-      }
-    }, [timeBreakdown(time).seconds, isRunning, vibrationEnabled, cueLength]);
 
     useImperativeHandle(ref, () => ({
       setTime: reset,
