@@ -35,7 +35,13 @@ export const Text = styled.Text<{
   typography?: Typography;
   color?: Color;
   bold?: boolean;
+  fill?: boolean;
 }>`
+  ${(p) =>
+    p.fill &&
+    css`
+      flex-grow: 1;
+    `}
   ${(p) => p.theme.typography[p.typography ?? "body"]}
   color: ${(p) => p.theme.colors[p.color ?? "white"]};
   ${(p) =>

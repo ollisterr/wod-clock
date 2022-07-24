@@ -1,10 +1,9 @@
 import React from "react";
-import { ScrollView, View } from "react-native";
-import { Button, ScreenWrapper, Spacer } from "../components";
-import { Row } from "../components/ExercisesModal/common";
+import { ScrollView } from "react-native";
+
+import { ScreenWrapper, Spacer } from "../components";
 import SettingRow from "../components/SettingRow";
 import { useSettings } from "../contexts/SettingsContext";
-
 import styled from "../styles";
 import { EvenRow, Input, Text } from "../styles/styles";
 
@@ -41,13 +40,20 @@ export default function SettingsScreen() {
           <InputRow disabled={!countdownEnabled}>
             <Text>Countdown length</Text>
 
-            <Input
-              value={countdownLength.toString()}
-              onChangeText={(x: string) =>
-                countdownEnabled && setCountdownLength(Number(x))
-              }
-              alignRight
-            />
+            <InputWrapper>
+              <Input
+                value={countdownLength.toString()}
+                onChangeText={(x) =>
+                  countdownEnabled && setCountdownLength(Number(x))
+                }
+                selectTextOnFocus
+                alignRight
+              />
+
+              <Spacer axis="x" />
+
+              <Text>sec</Text>
+            </InputWrapper>
           </InputRow>
         </Group>
 
@@ -65,14 +71,13 @@ export default function SettingsScreen() {
           />
 
           <InputRow disabled={!isCueEnabled}>
-            <Text>Cue on last</Text>
+            <Text fill>Cue on last</Text>
 
             <InputWrapper>
               <Input
                 value={cueLength.toString()}
-                onChangeText={(x: string) =>
-                  isCueEnabled && setCueLength(Number(x))
-                }
+                onChangeText={(x) => isCueEnabled && setCueLength(Number(x))}
+                selectTextOnFocus
                 alignRight
               />
 
@@ -98,7 +103,9 @@ const InputRow = styled(EvenRow)<{ disabled?: boolean }>`
 
 const InputWrapper = styled.View`
   flex-direction: row;
+  flex-shrink: 1;
   align-items: center;
+  justify-content: flex-end;
 `;
 
 const Group = styled.View`

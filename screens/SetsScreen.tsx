@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { ScrollView } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 
 import { ScreenWrapper, Timer, Set, Spacer } from "../components";
 import ExercisesModalButton from "../components/ExercisesModal";
@@ -12,8 +14,6 @@ import {
   Text,
   Title,
 } from "../styles/styles";
-import { ScrollView } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
 import theme from "../styles/theme";
 
 export default function SetsScreen() {
@@ -127,6 +127,8 @@ export default function SetsScreen() {
               <FontAwesome name="pencil" size={16} color={theme.colors.grey} />
             </ExercisesModalButton>
 
+            <Spacer fill />
+
             <BottomBarWrapper>
               <Text color="lightgrey">Rounds</Text>
 
@@ -136,6 +138,7 @@ export default function SetsScreen() {
                 value={roundsInput.toString()}
                 onChangeText={setRounds}
                 keyboardType="number-pad"
+                selectTextOnFocus
                 alignRight
               />
             </BottomBarWrapper>

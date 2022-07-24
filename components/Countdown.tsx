@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Modal } from "react-native";
 import Animated, {
   Easing,
@@ -6,7 +6,6 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { Audio } from "expo-av";
 
 import { Text } from "../styles/styles";
 import { SECOND } from "../constants/time";
@@ -24,10 +23,10 @@ interface Props {
 }
 
 export default function Countdown({ running, onCancel, onFinish }: Props) {
-  const { countdownLength } = useSettings();
+  const { countdownLength, cueLength } = useSettings();
   const { shortCue, longCue } = useSound();
 
-  const { start, time, stop } = useTimer({
+  const { start, time, stop, reset } = useTimer({
     name: "countdown",
     startValue: countdownLength * SECOND,
     intervalLength: 100,
@@ -51,13 +50,18 @@ export default function Countdown({ running, onCancel, onFinish }: Props) {
   }, [seconds]);
 
   useEffect(() => {
-    if (seconds > 4) return;
+    if (seconds > cueLength) return;
 
     shortCue();
-  }, [seconds, shortCue, longCue]);
+  }, [seconds, shortCue, longCue, cueLength]);
 
   useEffect(() => {
-    running ? start() : stop();
+    if (running) {
+      start();
+    } else {
+      stop();
+      reset();
+    }
   }, [running]);
 
   return (

@@ -80,6 +80,7 @@ export default function ExerciseDetails({
             value={exercise.name}
             onChangeText={(text) => setField("name", text)}
             placeholder="Untitle exercise"
+            selectTextOnFocus
             fill
           />
 
@@ -112,6 +113,7 @@ export default function ExerciseDetails({
             value={name}
             onChangeText={setName}
             placeholder="New set..."
+            selectTextOnFocus
             fill
           />
 
@@ -120,6 +122,7 @@ export default function ExerciseDetails({
               value={duration.toString()}
               onChangeText={(x) => setDuration(Number(x) || 0)}
               keyboardType="number-pad"
+              selectTextOnFocus
               alignRight
             />
 

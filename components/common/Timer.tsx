@@ -114,16 +114,14 @@ const Timer = forwardRef(
 
     return (
       <Wrapper>
-        {shouldStart && (
-          <Countdown
-            running={shouldStart && countdownEnabled && time === resetValue}
-            onFinish={() => {
-              setShouldStart(false);
-              start();
-            }}
-            onCancel={() => setShouldStart(false)}
-          />
-        )}
+        <Countdown
+          running={shouldStart && countdownEnabled && time === resetValue}
+          onFinish={() => {
+            setShouldStart(false);
+            start();
+          }}
+          onCancel={() => setShouldStart(false)}
+        />
 
         <TimerWrapper>
           {showHours && (

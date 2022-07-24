@@ -52,6 +52,16 @@ export default function ExercisesModalButton({
     setIsModalOpen(false);
   };
 
+  const addExercise = () => {
+    const exercise: Exercise = {
+      name: "New Exercise",
+      timestamp: Date.now(),
+      sets: [],
+    };
+
+    setSelectedExercise(exercise);
+  };
+
   return (
     <>
       <ModalButton onPress={() => setIsModalOpen(true)} noPadding={noPadding}>
@@ -76,7 +86,7 @@ export default function ExercisesModalButton({
         ) : (
           <ExercisesList
             exercises={exercises}
-            onAddButtonPress={() => toggleShowExerciseDetails(true)}
+            onAddButtonPress={addExercise}
             onExerciseSelect={selectExercise}
             onExerciseEdit={(exercise) => {
               setSelectedExercise(exercise);
